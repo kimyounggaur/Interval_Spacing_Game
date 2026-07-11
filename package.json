@@ -1,0 +1,30 @@
+{
+  "name": "ijeong-station",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format:check": "prettier src tests docs public scripts package.json index.html tsconfig.json tsconfig.node.json vite.config.ts vitest.config.ts eslint.config.js --check",
+    "test:unit": "vitest run tests/unit",
+    "test:property": "vitest run tests/property",
+    "test:traceability": "node scripts/verify-traceability.mjs",
+    "test:quick": "npm run typecheck && npm run lint && npm run test:unit && npm run build",
+    "test:all:local": "npm run test:quick && npm run test:traceability",
+    "verify": "npm run test:all:local"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "eslint": "latest",
+    "playwright": "^1.61.1",
+    "prettier": "latest",
+    "typescript": "latest",
+    "typescript-eslint": "latest",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}

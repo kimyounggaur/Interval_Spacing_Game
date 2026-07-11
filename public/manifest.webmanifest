@@ -1,0 +1,13 @@
+{
+  "name": "음정 정거장: 도레미 기차 여행",
+  "short_name": "음정 정거장",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#cdeeee",
+  "theme_color": "#cdeeee",
+  "lang": "ko",
+  "description": "음정의 이름, 반음 거리, 소리를 연결하는 오프라인 학습 게임",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

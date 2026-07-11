@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+test-results/
+*.tsbuildinfo
+*.log
+browser-*.png
+.vercel/
