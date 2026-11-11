@@ -47,7 +47,7 @@ document.addEventListener("ijs-storage-fallback", () =>
 if (storage.consumeMigrationNotice())
   view.toast("별과 스탬프를 옮겼어요. 진행 중이던 운행은 새 방식으로 다시 시작해요.");
 function beginTutorial(): void {
-  const demo = createTicket("deg:3", 12, null, () => 0.9);
+  const demo = createTicket("deg:3", 12, null, () => 0);
   if (demo) dispatch({ type: "START_TUTORIAL", ticket: demo });
   dispatch({ type: "OPEN", modal: "sound-check" });
   audio.playStart(60);

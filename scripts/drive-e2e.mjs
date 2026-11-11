@@ -174,6 +174,23 @@ const extraScenarios = Object.fromEntries(Object.entries(routeLengths).map(([rou
   assert.ok(saved.routes[route].stars >= 2);
   assert.equal(saved.activeRun, null);
 }]));
+async function tutorial({ page }) {
+  await action(page, "tutorial");
+  await page.getByRole("dialog").waitFor({ state: "visible" });
+  await action(page, "sound-yes");
+  assert.equal(await page.locator("#ticket-title").textContent(), "위로 3도");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Enter");
+  await page.locator("#next").waitFor({ state: "visible" });
+  assert.match(await page.locator("#readout").textContent(), /정답/);
+  await action(page, "next");
+  assert.equal(await page.locator("#screen").getAttribute("data-screen"), "routes");
+  const stored = await readSave(page);
+  assert.deepEqual(stored.mastery, {});
+  assert.equal(stored.stats.tickets, 0);
+  assert.equal(stored.activeRun, null);
+}
 async function warmup({ page }) {
   await action(page, "routes"); await action(page, "start-basic");
   for (let i = 0; i < 2; i++) {
@@ -221,12 +238,13 @@ try {
   }
   for (const viewport of viewports) {
     for (const [id, fn] of Object.entries(extraScenarios)) if (wanted(id)) await runCase(id, viewport, fn);
+    if (wanted("TUTORIAL")) await runCase("TUTORIAL", viewport, tutorial);
     if (wanted("WARMUP")) { const initial = save(); initial.routes.basic.runs = 0; await runCase("WARMUP", viewport, warmup, initial); }
     if (wanted("SCREENSHOTS")) await runCase("SCREENSHOTS", viewport, screenshots);
   }
 } catch (error) { results.push({ status: "NOT_RUN", error: error.message }); console.error(error.message); }
 finally { await browser?.close(); server?.kill(); writeFileSync("test-results/drive-e2e.json", JSON.stringify({ date: new Date().toISOString(), base, results }, null, 2)); }
 const passed = results.filter((result) => result.status === "PASS").length;
-const expected = viewports.length * [...Object.keys(scenarios), ...Object.keys(extraScenarios), "WARMUP", "SCREENSHOTS"].filter(wanted).length;
-console.log(`E2E: ${passed}/${expected} passed (45 core cases, 12 route completions, 3 warmup checks, 3 screenshot audits)`);
+const expected = viewports.length * [...Object.keys(scenarios), ...Object.keys(extraScenarios), "TUTORIAL", "WARMUP", "SCREENSHOTS"].filter(wanted).length;
+console.log(`E2E: ${passed}/${expected} passed (45 core cases, 12 route completions, 3 tutorial checks, 3 warmup checks, 3 screenshot audits)`);
 if (passed !== expected) process.exitCode = 1;
