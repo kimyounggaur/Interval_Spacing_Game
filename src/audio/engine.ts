@@ -79,6 +79,7 @@ export class WebAudioEngine implements AudioPort {
   private sequencer: Sequencer | null = null;
   private settings: AudioSettings = { volume: 0.75, muted: false };
   private listeners = new Set<(state: AudioState) => void>();
+  private lastNotifiedState: AudioState = "locked";
   private resuming: Promise<boolean> | null = null;
   private disposed = false;
   private failed = false;
@@ -231,7 +232,10 @@ export class WebAudioEngine implements AudioPort {
     }
   }
   private notify(): void {
-    for (const listener of this.listeners) listener(this.state);
+    const state = this.state;
+    if (state === this.lastNotifiedState) return;
+    this.lastNotifiedState = state;
+    for (const listener of this.listeners) listener(state);
   }
 }
 

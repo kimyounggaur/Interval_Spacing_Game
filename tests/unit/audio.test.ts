@@ -208,6 +208,27 @@ describe("DR2 clock-scheduled audio", () => {
     unsubscribe();
   });
 
+  it("repeated running unlocks emit no duplicate state notifications during native input events", async () => {
+    const { audio, events, suspend } = harness();
+    const first = vi.fn();
+    audio.subscribe(first);
+    expect(first.mock.calls).toEqual([["locked"]]);
+    await audio.unlock();
+    expect(first.mock.calls).toEqual([["locked"], ["running"]]);
+    for (const name of UNLOCK_EVENTS) events.dispatchEvent(new Event(name));
+    await audio.unlock();
+    expect(first.mock.calls).toEqual([["locked"], ["running"]]);
+    const second = vi.fn();
+    audio.subscribe(second);
+    expect(second.mock.calls).toEqual([["running"]]);
+    await audio.unlock();
+    expect(second).toHaveBeenCalledOnce();
+    suspend();
+    await audio.unlock();
+    expect(first.mock.calls).toEqual([["locked"], ["running"], ["suspended"], ["running"]]);
+    expect(second.mock.calls).toEqual([["running"], ["suspended"], ["running"]]);
+  });
+
   it("volume and mute update the master; disposed gestures cannot recreate audio", async () => {
     const { audio, gains, factory, events } = harness();
     audio.setSettings({ volume: 0.5, muted: false });

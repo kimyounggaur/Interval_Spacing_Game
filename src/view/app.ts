@@ -64,6 +64,7 @@ export function createView(root: HTMLElement) {
   let currentModal: string | null = null;
   let previousFocus: HTMLElement | null = null;
   let lastLive = "";
+  let renderedSettings: GameState["save"]["settings"] | null = null;
   function render(state: GameState, audioState: AudioState, offline: boolean, dragging = false) {
     root.dataset.motion = state.save.settings.motion;
     document.documentElement.dataset.motion = state.save.settings.motion;
@@ -72,6 +73,7 @@ export function createView(root: HTMLElement) {
       // Move the retained stage out before replacing a screen that may contain it.
       el("run-stage-slot").prepend(stage.element);
       currentScreen = state.screen;
+      renderedSettings = null;
       pages.hidden = state.screen === "run";
       run.hidden = state.screen !== "run";
       if (state.screen !== "run") pages.innerHTML = screenTemplate(state);
@@ -191,7 +193,8 @@ export function createView(root: HTMLElement) {
     const off = pages.querySelector("#offline");
     if (off)
       off.textContent = offline ? "오프라인 준비 완료" : "온라인 실행 중 · 오프라인 준비 확인 중";
-    if (state.screen === "settings") {
+    if (state.screen === "settings" && renderedSettings !== state.save.settings) {
+      renderedSettings = state.save.settings;
       for (const input of pages.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
         "[data-setting]",
       )) {
