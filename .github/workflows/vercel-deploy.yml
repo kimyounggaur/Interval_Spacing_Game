@@ -38,6 +38,21 @@ jobs:
       - name: Quality gate
         run: npm run test:quick
 
+      - name: Install browser for end-to-end checks
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end and traceability gate
+        run: npm run test:traceability && npm run test:e2e
+
+      - name: Upload browser QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-browser-qa-${{ github.run_id }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Install Vercel CLI
         run: npm install --global vercel@50.28.0
 

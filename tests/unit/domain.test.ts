@@ -1,15 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { BOARD, CARDS, INTERVALS, WHITE_CELLS } from "../../src/domain/data";
-import {
-  greenTarget,
-  isModeClear,
-  makeRng,
-  mergeNotebook,
-  planMove,
-  redMoveTarget,
-  shuffle,
-} from "../../src/domain/engine";
+import { BOARD, WHITE_CELLS } from "../../src/game/track";
+import { makeRng, shuffle } from "../../src/game/random";
+import { createTicket, greenOptions, makeOptions } from "../../src/game/generator";
+import { applyMastery, planRun, ROUTES, runStars } from "../../src/game/planner";
+import { commonBySemis, isWhitePc, midiOf } from "../../src/theory";
+import { defaultSave } from "../../src/infra/storage";
 
+// The design §11.1 retains DAT-BOARD and seeded shuffle verbatim in meaning.
+// The other eight contracts are explicitly replaced below and mapped in decision-log.md.
 describe("[DAT-BOARD] 보드 정본", () => {
   it("25칸이며 중앙 도는 MIDI 60이다", () => {
     expect(BOARD).toHaveLength(25);
@@ -17,74 +15,67 @@ describe("[DAT-BOARD] 보드 정본", () => {
     expect(WHITE_CELLS).toHaveLength(15);
   });
 
-  it("[DAT-DECK] 48장 분포와 고정 ID를 보존한다", () => {
-    expect(CARDS).toHaveLength(48);
-    expect(CARDS.filter((card) => card.type === "green")).toHaveLength(12);
-    expect(CARDS.filter((card) => card.type === "yellow")).toHaveLength(24);
-    expect(CARDS.filter((card) => card.type === "red")).toHaveLength(12);
-    expect(CARDS.map((card) => card.id)).toEqual(
-      Array.from({ length: 48 }, (_, index) => String(index + 1).padStart(3, "0")),
-    );
-    expect(CARDS[0]?.back).toContain("옆");
-    expect(CARDS[22]).toMatchObject({
-      type: "yellow",
-      semi: 6,
-      dir: 1,
-      intervalName: "증4도/감5도",
-    });
-    expect(CARDS[23]).toMatchObject({ type: "yellow", semi: 6, dir: -1 });
-    expect(CARDS[34]).toMatchObject({ type: "yellow", semi: 12, dir: 1 });
-    expect(CARDS[35]).toMatchObject({ type: "yellow", semi: 12, dir: -1 });
-    expect(CARDS[36]).toMatchObject({ type: "red", title: "소리 미션 01" });
-    expect(CARDS[47]).toMatchObject({ type: "red", title: "소리 미션 12" });
+  it("[DAT-DECK → RN-01] 고정 덱 대신 노선마다 정해진 K장의 운행을 만든다", () => {
+    const save = defaultSave();
+    for (const route of ["intro", "basic", "full", "ear", "mixed"] as const) {
+      const plan = planRun(route, 42, save);
+      expect(plan).toHaveLength(ROUTES[route].length);
+      expect(plan.every((key) => /^(deg|read|make|ear):/.test(key))).toBe(true);
+    }
   });
 
-  it("[DAT-INTERVAL] 12개 음정은 1~12 반음을 덮는다", () => {
-    expect(INTERVALS.slice(1).map((interval) => interval.semi)).toEqual(
+  it("[DAT-INTERVAL → TH-08] 계산한 흔한 음정이 1~12 반음을 덮는다", () => {
+    expect(Array.from({ length: 12 }, (_, index) => commonBySemis(index + 1)[0]!.semis)).toEqual(
       Array.from({ length: 12 }, (_, index) => index + 1),
     );
+    expect(commonBySemis(6).map((iv) => `${iv.quality}${iv.num}`)).toEqual(["A4", "d5"]);
   });
 });
 
-describe("[ENG-GREEN] 초록 도수 엔진", () => {
-  it("출발음을 1로 세며 흰건반만 이동한다", () => {
-    expect(greenTarget(12, 5, 1)).toBe(19);
-    expect(greenTarget(12, 3, -1)).toBe(9);
-    expect(greenTarget(12, 2, 1)).toBe(14);
-    expect(greenTarget(23, 3, 1)).toBeNull();
-    expect(greenTarget(0, 2, -1)).toBeNull();
-    expect(greenTarget(13, 2, 1)).toBeNull();
+describe("[ENG-GREEN → GN-01/GN-05] 흰 역 도수 승차권", () => {
+  it("출발음을 1로 세며 풀 수 있는 흰 역만 목적지로 낸다", () => {
+    expect(greenOptions(12)).toContainEqual({ num: 5, dir: 1, target: 19 });
+    expect(greenOptions(12)).toContainEqual({ num: 3, dir: -1, target: 9 });
+    expect(greenOptions(12)).toContainEqual({ num: 2, dir: 1, target: 14 });
+    expect(greenOptions(23)).not.toContainEqual(expect.objectContaining({ num: 3, dir: 1 }));
+    expect(greenOptions(0)).not.toContainEqual(expect.objectContaining({ num: 2, dir: -1 }));
+    expect(greenOptions(13)).toEqual([]);
   });
 });
 
-describe("[ENG-YELLOW] 노랑 환승 엔진", () => {
-  it("모듈러 랩어라운드가 아니라 옥타브 환승 후 다시 센다", () => {
-    expect(planMove(12, 7)).toEqual({ originalFrom: 12, from: 12, target: 19, transfers: [] });
-    expect(planMove(24, 12)).toEqual({ originalFrom: 24, from: 0, target: 12, transfers: [0] });
-    expect(planMove(14, 12)).toEqual({ originalFrom: 14, from: 2, target: 14, transfers: [2] });
-    expect(planMove(0, -1)).toEqual({ originalFrom: 0, from: 24, target: 23, transfers: [24] });
-    expect(planMove(2, -6)).toEqual({ originalFrom: 2, from: 14, target: 8, transfers: [14] });
+describe("[ENG-YELLOW → GN-04/GN-05] 환승 없는 만들기", () => {
+  it("환승 대신 현재 위치에서 낼 수 있는 방향과 철자만 선택한다", () => {
+    const ticket = createTicket("make:P8", 24, null, () => 0);
+    expect(ticket).toMatchObject({ start: 24, target: 12, dir: -1 });
+    expect(ticket).not.toHaveProperty("transfers");
+    expect(createTicket("make:M3", 12, null, () => 0)).toMatchObject({ start: 12, target: 16 });
   });
 
-  it("25×24 유효 입력의 결과는 항상 보드 안이다", () => {
-    for (let position = 0; position <= 24; position += 1) {
-      for (let delta = -12; delta <= 12; delta += 1) {
-        if (delta === 0) continue;
-        const result = planMove(position, delta);
-        expect(result.from).toBeGreaterThanOrEqual(0);
-        expect(result.from).toBeLessThanOrEqual(24);
-        expect(result.target).toBeGreaterThanOrEqual(0);
-        expect(result.target).toBeLessThanOrEqual(24);
-        expect(result.transfers.length).toBeLessThanOrEqual(1);
+  it("25칸의 모든 생성 후보가 선로 안이며 이동은 최대 12칸이다", () => {
+    for (let position = 0; position <= 24; position++) {
+      const candidates = makeOptions(position);
+      expect(candidates.length).toBeGreaterThan(0);
+      for (const candidate of candidates) {
+        expect(candidate.target).toBeGreaterThanOrEqual(0);
+        expect(candidate.target).toBeLessThanOrEqual(24);
+        expect(Math.abs(candidate.target - position)).toBeLessThanOrEqual(12);
+        expect(midiOf(candidate.targetNote)).toBe(48 + candidate.target);
       }
     }
   });
 });
 
-describe("[ENG-RED] 빨강 이동과 결정론", () => {
-  it("보드 끝에서는 하행으로 돌아온다", () => {
-    expect(redMoveTarget(20, 7)).toBe(13);
-    expect(redMoveTarget(5, 7)).toBe(12);
+describe("[ENG-RED → AU-04/RN-03] 청음 이동과 결정론", () => {
+  it("두 청음 음을 선로 안에서 생성하고 도착한 철자를 보존한다", () => {
+    const ticket = createTicket("ear:P5", 20, null, () => 0, { earLevel: 3 });
+    expect(ticket).toMatchObject({ start: 20, target: 13, dir: -1 });
+    expect(ticket!.targetNote).toBeDefined();
+    for (const position of [0, 12, 24]) {
+      const octave = createTicket("ear:P8", position, null, () => 0, { earLevel: 3 });
+      expect(octave!.target).toBeGreaterThanOrEqual(0);
+      expect(octave!.target).toBeLessThanOrEqual(24);
+    }
+    expect(isWhitePc(60)).toBe(true);
   });
 
   it("같은 seed의 셔플은 같은 카드 순서를 만든다", () => {
@@ -94,34 +85,20 @@ describe("[ENG-RED] 빨강 이동과 결정론", () => {
   });
 });
 
-describe("[NBK-MERGE] 수첩과 승리", () => {
-  it("red full은 redAux를 정규화하고 merge는 멱등이다", () => {
-    const first = mergeNotebook(
-      { greenDegrees: [], yellow: [], red: [3], redAux: [3, 4] },
-      { greenDegrees: [], yellow: [2], red: [4], redAux: [4, 5] },
-    );
-    expect(first.red).toEqual([3, 4]);
-    expect(first.redAux).toEqual([5]);
-    expect(mergeNotebook(first, first)).toEqual(first);
+describe("[NBK-MERGE/WIN → RN-04/RN-05] 숙련도와 운행 완료", () => {
+  it("반쪽 스탬프가 기존 ●를 지우지 않고 상자는 성과에 따라 움직인다", () => {
+    const full = applyMastery({}, "ear:m3", 2);
+    expect(full["ear:m3"]).toMatchObject({ stamp: 2, box: 1, seen: 1, clean: 1 });
+    const assisted = applyMastery(full, "ear:m3", 1);
+    expect(assisted["ear:m3"]).toMatchObject({ stamp: 2, box: 0, seen: 2, clean: 1 });
+    expect(full["ear:m3"]!.box).toBe(1);
   });
 
-  it("모드별 승리 조건을 round notebook으로 판정한다", () => {
-    expect(
-      isModeClear("intro", { greenDegrees: [2, 3, 4, 5], yellow: [], red: [], redAux: [] }),
-    ).toBe(true);
-    expect(
-      isModeClear("basic", { greenDegrees: [], yellow: [1, 2, 3, 4, 5, 6], red: [], redAux: [] }),
-    ).toBe(true);
-    expect(
-      isModeClear("ear", { greenDegrees: [], yellow: [], red: [1, 2, 3, 4, 5, 6], redAux: [] }),
-    ).toBe(true);
-    expect(
-      isModeClear("mixed", {
-        greenDegrees: [],
-        yellow: [1, 2, 3, 4, 5, 6],
-        red: [1, 2, 3],
-        redAux: [],
-      }),
-    ).toBe(true);
+  it("서로 다른 수첩 개수 대신 완료한 K장과 자력 정답 비율로 별을 계산한다", () => {
+    expect(runStars([2, 2, 2, 2, 2, 2, 2], true)).toBe(3);
+    expect(runStars([2, 2, 2, 2, 2, 2, 1], false)).toBe(2);
+    expect(runStars([2, 2, 2, 1, 1, 1], false)).toBe(1);
+    expect(runStars([], true)).toBe(0);
+    expect(planRun("basic", 9, defaultSave())).toHaveLength(6);
   });
 });

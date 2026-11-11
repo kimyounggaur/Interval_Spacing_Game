@@ -8,6 +8,7 @@ export default tseslint.config(
       "node_modules",
       "coverage",
       "test-results",
+      "tests/e2e/*.mjs",
       "eslint.config.js",
       "public/**",
       "scripts/**",

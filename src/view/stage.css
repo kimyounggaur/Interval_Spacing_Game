@@ -1,0 +1,228 @@
+.drive-stage {
+  position: relative;
+  min-height: 210px;
+  overflow: hidden;
+  border-radius: 20px;
+  isolation: isolate;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  background: #cdeeee;
+  box-shadow:
+    inset 0 0 0 1px #1d4d3a24,
+    0 5px 0 #112d2314;
+}
+.drive-stage.dragging {
+  cursor: grabbing;
+}
+.drive-stage > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+.drive-stage .stage-world {
+  transition: transform 450ms ease;
+}
+.drive-stage .stage-train,
+.drive-stage .stage-bubble {
+  transition: transform 130ms ease-out;
+}
+.drive-stage.dragging .stage-train,
+.drive-stage.dragging .stage-bubble {
+  transition: none;
+}
+.drive-stage .station-platform {
+  fill: #fdf6e3;
+  stroke: #677c72;
+  stroke-width: 1.2;
+}
+.drive-stage .station-center {
+  fill: #ffe1aa;
+}
+.drive-stage .station-tunnel {
+  fill: #2b3a5c;
+  stroke: #687896;
+  stroke-width: 1.2;
+}
+.drive-stage .station-origin {
+  stroke: #ae4b24;
+  stroke-width: 3;
+}
+.drive-stage .station-name {
+  fill: #1f2b45;
+  font-weight: 850;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.drive-stage .stage-badge,
+.drive-stage .stage-hop,
+.drive-stage .stage-flag {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.drive-stage .stage-badge.on,
+.drive-stage .stage-hop.on,
+.drive-stage .stage-flag.on {
+  opacity: 1;
+}
+.drive-stage .stage-badge circle {
+  fill: #246246;
+  stroke: #fdf6e3;
+  stroke-width: 1;
+}
+.drive-stage .stage-badge text {
+  fill: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.drive-stage .stage-badge.ghost circle {
+  fill: #fdf6e3;
+  stroke: #246246;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2;
+}
+.drive-stage .stage-badge.ghost text {
+  fill: #1d4d3a;
+}
+.drive-stage .stage-hop path {
+  fill: none;
+  stroke: #98670b;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.drive-stage .stage-hop circle {
+  fill: #fff7dc;
+}
+.drive-stage .stage-hop text {
+  fill: #60400a;
+  font-size: 12px;
+  font-weight: 800;
+  dominant-baseline: central;
+  text-anchor: middle;
+}
+.drive-stage .stage-bubble rect {
+  fill: #fffdf6;
+  stroke: #2b3a5c;
+  stroke-width: 1.5;
+}
+.drive-stage .stage-bubble text {
+  fill: #1f2b45;
+  font-size: 14px;
+  font-weight: 850;
+  dominant-baseline: central;
+  text-anchor: middle;
+}
+.drive-stage .stage-legend {
+  font-size: 12px;
+  font-weight: 700;
+  fill: #38594c;
+}
+.drive-stage .stage-puff {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.drive-stage .stage-puff.go {
+  animation: stage-puff 480ms ease-out both;
+}
+.drive-stage .stage-stars {
+  opacity: 0;
+}
+.drive-stage[data-route="ear"] .stage-stars {
+  opacity: 1;
+}
+.drive-stage[data-route="ear"] .stage-legend {
+  fill: #fff5dd;
+}
+.drive-stage[data-tunnel="true"] .stage-world {
+  opacity: 0.1;
+}
+.drive-stage .stage-world {
+  transition:
+    transform 450ms ease,
+    opacity 220ms ease;
+}
+.drive-stage .stage-night-veil {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.drive-stage[data-tunnel="true"] .stage-night-veil {
+  opacity: 0.88;
+}
+.drive-stage .stage-popover {
+  position: absolute;
+  right: 10px;
+  top: 32px;
+  width: 54px;
+  pointer-events: none;
+  opacity: 0.92;
+}
+.drive-stage .stage-popover svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.drive-stage[data-route="ear"] .stage-popover {
+  opacity: 0.7;
+}
+@keyframes stage-puff {
+  0% {
+    opacity: 0.8;
+    transform: translate(0, 0) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-8px, -19px) scale(1.7);
+  }
+}
+[data-motion="reduced"] .drive-stage *,
+[data-motion="reduced"] .drive-stage {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-motion="system"] .drive-stage *,
+  :root:not([data-motion="full"]) .drive-stage * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.drive-stage[data-tunnel="true"] .station-name,
+.drive-stage[data-tunnel="true"] .stage-bubble,
+.drive-stage[data-tunnel="true"] .stage-badge,
+.drive-stage[data-tunnel="true"] .stage-hop,
+.drive-stage[data-tunnel="true"] .stage-flag {
+  opacity: 0 !important;
+}
+/* Idle travel and the live gesture update their positions directly. */
+.drive-stage[data-idle="true"] .stage-train,
+.drive-stage[data-idle="true"] .stage-bubble {
+  transition: none;
+}
+#ticket[data-phase="verify"] {
+  animation: ticket-punch 160ms ease-out;
+}
+@keyframes ticket-punch {
+  0% {
+    transform: scale(1.015);
+  }
+  55% {
+    transform: scale(0.985);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+[data-motion="reduced"] #ticket {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) #ticket {
+    animation: none !important;
+  }
+}

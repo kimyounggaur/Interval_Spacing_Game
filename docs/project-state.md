@@ -1,17 +1,13 @@
-# 프로젝트 상태
+# 프로젝트 상태 — DRIVE 3.0
 
-현재 STEP: STEP 17 통합 구현 및 로컬 검증 완료
+기준일: 2026-11-11 (KST). 원본: `d3518cc`. 첨부 운전형 리마스터 설계서의 DR0~DR8 구현을 통합했다. **자동 코드 검사와 실기기 완료 조건을 구분한다.**
 
-마지막 통과 게이트: `npm run format:check`, `npm run test:quick`, `npm run test:traceability`, production preview PWA smoke
+현재 실행 증거는 단위 **71/71**, 속성 **11/11 PASS**다. 타입·lint·빌드·산출물 검사도 PASS다(HTML 131,111바이트, gzip 63,704바이트). 로컬 Chromium E2E는 소켓 권한 제한으로 NOT_RUN이며 CI 실행 결과는 `drive-gate-report.md`에서 최종 갱신한다. 원본 버전의 단위 13/13과 빌드 기준선은 `drive-baseline.md`에 별도로 남겼다.
 
-완료 요구사항 ID: DAT-BOARD-001, DAT-DECK-001, ENG-GREEN-001, ENG-YEL-001, ENG-RED-001, MOD-ROUTES-001, UI-SCREENS-001, RED-LEAK-001, SAV-V2-001, A11Y-TARGET-001, PWA-OFF-001
+구현된 내용: 철자 기반 이론 엔진, 오디오 클록 예약·취소, reducer 전용 전이, 유지되는 SVG 무대, 밀기·단추·키보드 운전, 도수·만들기·읽기·듣기, 다섯 노선과 적응 출제, 숙련도·스탬프·별, 운행 복원, v3 저장 이전, 플레이형 안내, 내장 그림·글꼴, 단일 HTML 빌드와 PWA 캐시 상태 표시.
 
-진행 중인 요구사항 ID: 실제 기기 오디오·진동, VoiceOver/TalkBack, pinned Linux visual diff, full cross-browser E2E
+설계 해석 두 가지는 `decision-log.md`에 기록했다. 기본 노선의 반음 2장 연습은 최초 2회에 별도 준비 운행으로 실행해 실제 K=6 읽기를 유지한다. 청음 1단계의 상행이 현재 역에서 불가능하면 범위 안 하행으로 출제해 운행 연속성을 지킨다.
 
-변경 파일: `src/domain/*`, `src/infra/*`, `src/main.ts`, `src/styles.css`, `public/*`, `tests/*`, `docs/*`, `scripts/*`, 프로젝트 설정 파일
+남은 검증: 브라우저 E-01~E-15와 화면 캡처의 최종 결과 반영, 실제 iPhone/Android의 운전·소리·설치·복귀, VoiceOver/TalkBack, 130% 글자 확대·대비, 중급 폰 성능, 대표 소리의 악보 위치에 대한 강사 검수. 실기기와 강사 검수는 **NOT_RUN**이며 GDR2·GDR4·GDR7·GDR8 전체를 PASS로 선언하지 않는다.
 
-마스터 실행 테스트의 종료 코드: 위 로컬 게이트 모두 0
-
-미해결 위험: 브라우저별 Web Audio 정책과 실제 설치형 PWA 업데이트 시나리오는 수동/preview 환경에서 추가 확인해야 한다.
-
-다음 정확한 작업: 실제 iOS Safari/Android Chrome/VoiceOver/TalkBack과 pinned Linux visual baseline을 별도 수동·CI 게이트로 운영한다.
+검사 대응표는 `test-matrix.md`, 게이트별 범위는 `drive-gate-report.md`, 기존 검사 8개의 대체 이유는 `decision-log.md`를 따른다. 저장소에는 소스와 검사를 보관하고 `dist/`는 빌드로 생성한다.

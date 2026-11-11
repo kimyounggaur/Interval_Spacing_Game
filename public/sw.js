@@ -1,9 +1,14 @@
-const CACHE = "ijeong-station-v3";
-const APP_SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icon.svg"];
+const CACHE = "ijs-drive-__BUILD_ID__";
+const APP_SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(APP_SHELL)));
-  self.skipWaiting();
+  // Updates wait while a lesson is open. A fresh app launch may activate a
+  // previously waiting worker; there is deliberately no automatic reload.
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "ACTIVATE_ON_LAUNCH") void self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -14,7 +19,7 @@ self.addEventListener("activate", (event) => {
         Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))),
       ),
   );
-  self.clients.claim();
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("fetch", (event) => {
@@ -33,7 +38,11 @@ self.addEventListener("fetch", (event) => {
       })
       .catch(async () => {
         const cached = await caches.match(event.request);
-        return cached ?? caches.match("/index.html");
+        if (cached) return cached;
+        if (event.request.mode === "navigate") {
+          return (await caches.match("/index.html")) ?? Response.error();
+        }
+        return Response.error();
       }),
   );
 });
