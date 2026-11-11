@@ -17,6 +17,18 @@ const results = [];
 const requested = process.env.E2E_CASES?.split(",");
 const wanted = (id) => !requested || requested.includes(id);
 const routeIds = ["intro", "basic", "full", "ear", "mixed"];
+const routeArtwork = {
+  intro: "/art/meadow.webp",
+  basic: "/art/village.webp",
+  full: "/art/mountains.webp",
+  ear: "/art/night-tunnel.webp",
+  mixed: "/art/sea-bridge.webp",
+};
+const artworkPaths = [
+  "/art/title-hero.webp",
+  "/art/route-map.webp",
+  ...Object.values(routeArtwork),
+];
 const spellingFixture = {
   kind: "make",
   start: 12,
@@ -118,6 +130,36 @@ async function start(page, route = "intro") {
   await action(page, "routes");
   await action(page, `start-${route}`);
   await ticket(page);
+}
+async function decodeArtwork(page) {
+  const decoded = await page.evaluate(async (paths) => {
+    return Promise.all(
+      paths.map(async (path) => {
+        const url = new URL(path, location.href);
+        const response = await fetch(url);
+        const bytes = await response.arrayBuffer();
+        const image = new Image();
+        image.src = url.href;
+        await image.decode();
+        return {
+          path,
+          sameOrigin: new URL(response.url).origin === location.origin,
+          status: response.status,
+          type: response.headers.get("content-type"),
+          bytes: bytes.byteLength,
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        };
+      }),
+    );
+  }, artworkPaths);
+  assert.equal(decoded.length, 7);
+  for (const art of decoded) {
+    assert.ok(art.sameOrigin, `${art.path} must stay on the game origin`);
+    assert.equal(art.status, 200, `${art.path} response`);
+    assert.match(art.type ?? "", /^image\/webp(?:;|$)/, `${art.path} type`);
+    assert.ok(art.bytes > 0 && art.width > 0 && art.height > 0, `${art.path} must decode`);
+  }
 }
 async function keyAction(page, wanted) {
   for (let i = 0; i < 50; i++) {
@@ -512,6 +554,93 @@ const extraScenarios = Object.fromEntries(
     },
   ]),
 );
+async function renderedBackgrounds(page, selector) {
+  return page
+    .locator(selector)
+    .evaluate((root) =>
+      [root, ...root.querySelectorAll("*")].flatMap((element) =>
+        [null, "::before", "::after"].map(
+          (pseudo) => getComputedStyle(element, pseudo).backgroundImage,
+        ),
+      ),
+    );
+}
+const remasterScenarios = {
+  "R-01": async ({ page }) => {
+    await decodeArtwork(page);
+  },
+  "R-02": async ({ page }) => {
+    assert.ok(
+      (await renderedBackgrounds(page, "#pages")).some((image) =>
+        image.includes("/art/title-hero.webp"),
+      ),
+      "title uses the approved hero artwork",
+    );
+    await action(page, "routes");
+    assert.ok(
+      (await renderedBackgrounds(page, "#pages")).some((image) =>
+        image.includes("/art/route-map.webp"),
+      ),
+      "route selection uses the approved map artwork",
+    );
+    for (const route of routeIds) {
+      const card = page.locator(`.route[data-route="${route}"]`);
+      assert.equal(await card.count(), 1, `${route} route card`);
+      assert.ok(
+        (await card.locator(`[data-asset="route-${route}"] path`).count()) > 0,
+        `${route} uses its imported route token`,
+      );
+    }
+    for (const route of routeIds) {
+      await action(page, `start-${route}`);
+      await ticket(page);
+      assert.equal(await page.locator("#stage").getAttribute("data-route"), route);
+      assert.ok(
+        (
+          await page
+            .locator("#stage")
+            .evaluate((element) => getComputedStyle(element).backgroundImage)
+        ).includes(routeArtwork[route]),
+        `${route} uses its approved stage background`,
+      );
+      const locomotive = page.locator('#train [data-asset="locomotive-right"]');
+      assert.equal(await locomotive.count(), 1);
+      assert.ok((await locomotive.locator("path").count()) >= 15, "imported locomotive geometry");
+      assert.equal(await locomotive.locator(".wheel").count(), 3, "three imported train wheels");
+      assert.equal(
+        await locomotive.locator('[id*="locomotive-right-hatch"]').count(),
+        1,
+        "imported locomotive definitions survive namespacing",
+      );
+      await action(page, "pause");
+      await action(page, "routes");
+    }
+  },
+  "R-03": async ({ page, context }) => {
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    await waitFor(() => page.evaluate(() => !!navigator.serviceWorker.controller));
+    await waitFor(() =>
+      page.evaluate(async (paths) => {
+        const entries = await Promise.all(paths.map((path) => caches.match(path)));
+        return entries.every((response) => response?.ok);
+      }, artworkPaths),
+    );
+    await context.setOffline(true);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.locator('#screen[data-screen="title"]').waitFor({ state: "visible" });
+    await decodeArtwork(page);
+    await start(page);
+    assert.ok(
+      (
+        await page
+          .locator("#stage")
+          .evaluate((element) => getComputedStyle(element).backgroundImage)
+      ).includes(routeArtwork.intro),
+      "offline reload retains the meadow artwork",
+    );
+    assert.equal(await page.locator('#train [data-asset="locomotive-right"]').count(), 1);
+  },
+};
 async function tutorial({ page }) {
   await action(page, "tutorial");
   await page.getByRole("dialog").waitFor({ state: "visible" });
@@ -675,6 +804,8 @@ try {
   for (const viewport of viewports) {
     for (const [id, fn] of Object.entries(extraScenarios))
       if (wanted(id)) await runCase(id, viewport, fn);
+    for (const [id, fn] of Object.entries(remasterScenarios))
+      if (wanted(id)) await runCase(id, viewport, fn);
     if (wanted("TUTORIAL")) await runCase("TUTORIAL", viewport, tutorial);
     if (wanted("WARMUP")) {
       const initial = save();
@@ -700,11 +831,12 @@ const expected =
   [
     ...Object.keys(scenarios),
     ...Object.keys(extraScenarios),
+    ...Object.keys(remasterScenarios),
     "TUTORIAL",
     "WARMUP",
     "SCREENSHOTS",
   ].filter(wanted).length;
 console.log(
-  `E2E: ${passed}/${expected} passed (45 core cases, 12 route completions, 3 tutorial checks, 3 warmup checks, 3 screenshot audits)`,
+  `E2E: ${passed}/${expected} passed (45 core cases, 12 route completions, 9 artwork checks, 3 tutorial checks, 3 warmup checks, 3 screenshot audits)`,
 );
 if (passed !== expected) process.exitCode = 1;

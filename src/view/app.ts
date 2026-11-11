@@ -12,7 +12,8 @@ import {
 import type { GameState, Route, Ticket } from "../game/types";
 import type { AudioState } from "../audio/engine";
 import { buildStage } from "./stage";
-import { popoSvg, svgIcon } from "./assets";
+import { popoSvg, svgIcon, railSvg, railAssetUrl } from "./assets";
+import { ART } from "../assets/railway/art";
 
 const esc = (value: string): string =>
   value.replace(
@@ -34,7 +35,16 @@ const kindNames: Record<Ticket["kind"], string> = {
   ear: "소리 승차권",
 };
 export function createView(root: HTMLElement) {
-  root.innerHTML = `<div id="screen" class="shell" data-screen="title"><div id="pages"></div><section id="run" class="run" aria-label="기차 운전" hidden>
+  for (const [key, url] of Object.entries(ART))
+    root.style.setProperty(`--art-${key}`, `url("${url}")`);
+  for (const name of ["normal", "pressed", "locked", "checked"])
+    root.style.setProperty(`--button-${name}`, `url("${railAssetUrl(`button-${name}`, true)}")`);
+  for (const name of ["full", "half"])
+    root.style.setProperty(`--stamp-${name}`, `url("${railAssetUrl(`stamp-${name}`)}")`);
+  for (const name of ["filled", "outline"])
+    root.style.setProperty(`--star-${name}`, `url("${railAssetUrl(`star-${name}`)}")`);
+
+  root.innerHTML = `<div id="screen" class="shell" data-screen="title" data-railway="true"><div id="pages"></div><section id="run" class="run" aria-label="기차 운전" hidden>
     <header class="hud"><span id="hud-title" class="hud-title"></span><div id="hud-dots" class="hud-dots" aria-label="승차권 진행"></div><button data-action="sound" id="sound-chip" class="sound-chip">소리 켜기</button>${icon("pause", "일시정지", "pause")}</header>
     <section id="ticket" class="ticket" aria-label="승차권"><div class="ticket-stripe"></div><div class="ticket-main"><span id="ticket-kind" class="ticket-kind"></span><strong id="ticket-title" class="ticket-title"></strong><span id="ticket-sub" class="ticket-sub"></span></div><div class="ticket-stub"><small>출발</small><b id="ticket-from"></b></div></section>
     <div id="run-stage-slot" class="stage-slot"><div id="stage"></div><div id="ear-panel" class="ear-panel" hidden><div id="ear-direction" class="ear-direction"><p>두 번째 음은 어떻게 움직였나요?</p><div class="row">${btn("direction-up", "위로 ↑", "primary")}${btn("direction-down", "아래로 ↓", "outline")}</div></div><div id="ear-choices" class="ear-choices"></div></div></div>
@@ -120,6 +130,10 @@ export function createView(root: HTMLElement) {
         `${state.run.results.length}/${state.run.plan.length}장 도착`,
       );
       el("ticket").dataset.kind = t.kind;
+      el("ticket").style.setProperty(
+        "--ticket-frame",
+        `url("${railAssetUrl(`ticket-${t.kind === "semitone" ? "make" : t.kind}`, true)}")`,
+      );
       el("ticket").dataset.phase = state.phase;
       el("ticket-kind").textContent = kindNames[t.kind];
       el("ticket-title").textContent = t.title;
@@ -266,12 +280,12 @@ function screenTemplate(state: GameState): string {
     return `<section class="page hero"><header class="hero-top"><span class="brand">도레미 기차 여행</span><div class="row">${icon("notebook", "음정 수첩", "notebook")}${icon("settings", "설정", "settings")}</div></header><div class="hero-copy"><span class="eyebrow">한 역씩, 귀와 눈으로</span><h1 tabindex="-1">음정 정거장</h1><p>기차를 직접 몰며<br>두 음 사이의 거리를 발견해요.</p></div><div data-stage-slot></div><div class="hero-actions">${btn("routes", "출발하기 " + svgIcon("play"), "primary")}${state.save.activeRun ? btn("resume", "하던 여행 이어하기", "secondary") : btn("tutorial", "포포와 운전 연습", "outline")}</div><span class="hero-foot">소리 · 도수 · 반음이 하나로 이어지는 여행</span></section>`;
   if (state.screen === "routes")
     return `<section class="page">${head("오늘은 어느 노선으로?")}<div class="route-intro">${popoSvg("default")}<div><p>한 역씩 움직이며 직접 세어 봐요.</p><span class="small muted">● 혼자 도착 · ◐ 도움받아 도착</span></div></div><div class="routes">${ROUTE_IDS.map(
-      (id, i) => {
+      (id) => {
         const route = ROUTES[id],
           items = routeItems(id, state.save),
           count = items.filter((key) => state.save.mastery[key]?.stamp === 2).length,
           open = routeUnlocked(id, state.save);
-        return `<button class="route" data-action="start-${id}" ${open ? "" : "disabled"}><span class="route-num">${i + 1}</span><span><strong>${route.title}${id === "ear" ? ` · ${earLevel(state.save)}단계` : ""}</strong><p>${open ? route.subtitle : id === "ear" ? "기본 노선에서 별 1개를 모으면 열려요" : "기본·청음 노선에서 별 1개씩 모으면 열려요"}</p><span class="small muted">승차권 ${route.length}장${id === "ear" ? " · 소리가 필요해요" : ""}</span></span><span class="route-stars">${"★".repeat(state.save.routes[id].stars)}${"☆".repeat(3 - state.save.routes[id].stars)}<small>${routeMastered(id, state.save) ? "완주 배지" : `● ${count}/${items.length}`}</small></span></button>`;
+        return `<button class="route" data-action="start-${id}" data-route="${id}" ${open ? "" : "disabled"}><span class="route-token" aria-hidden="true">${railSvg(`route-${id}`)}</span><span><strong>${route.title}${id === "ear" ? ` · ${earLevel(state.save)}단계` : ""}</strong><p>${open ? route.subtitle : id === "ear" ? "기본 노선에서 별 1개를 모으면 열려요" : "기본·청음 노선에서 별 1개씩 모으면 열려요"}</p><span class="small muted">승차권 ${route.length}장${id === "ear" ? " · 소리가 필요해요" : ""}</span></span><span class="route-stars">${"★".repeat(state.save.routes[id].stars)}${"☆".repeat(3 - state.save.routes[id].stars)}<small>${routeMastered(id, state.save) ? "완주 배지" : `● ${count}/${items.length}`}</small></span></button>`;
       },
     ).join(
       "",
@@ -292,7 +306,7 @@ function screenTemplate(state: GameState): string {
     const r = state.run,
       clean = r.results.filter((x) => x === 2).length,
       stars = runStars(r.results, r.assistOff);
-    return `<section class="page">${head("종착역 도착")}<div class="result"><div class="confetti" aria-hidden="true">${Array.from({ length: 24 }, (_, i) => `<i style="--tx:${(i - 12) * 18}px;--rot:${i * 47}deg;--delay:${(i % 4) * 35}ms;--piece:${["#e77b43", "#2e7d5b", "#c69722", "#2b3a5c"][i % 4]}"></i>`).join("")}</div>${popoSvg("happy")}<span class="eyebrow">${ROUTES[r.route].title} · 여행 완료</span><h1>잘 다녀왔어요!</h1><div class="result-stars" aria-label="별 ${stars}개">${"★".repeat(stars)}${"☆".repeat(3 - stars)}</div><div class="panel"><div class="stamps" aria-label="이번 운행 스탬프">${r.results.map((x) => `<span>${stamp(x)}</span>`).join("")}</div><div class="result-stats"><div><strong>${r.results.length}</strong><span>도착한 승차권</span></div><div><strong>${clean}</strong><span>혼자 도착 ●</span></div><div><strong>${r.results.length - clean}</strong><span>도움받아 도착 ◐</span></div></div></div><p>우리가 지나온 역이 하나의 선율이 됐어요.</p>${btn("melody", "이번 여행 선율 듣기 " + svgIcon("play"), "secondary")}<div class="row">${btn(`start-${r.route}`, "다시 운행하기", "primary")}${btn("routes", "다른 노선 둘러보기")}</div><p class="small muted">전부 ●이면 별 2개, 세기 도움도 끄고 완주하면 별 3개예요.</p></div></section>`;
+    return `<section class="page">${head("종착역 도착")}<div class="result"><div class="confetti" aria-hidden="true">${Array.from({ length: 24 }, (_, i) => `<i style="--tx:${(i - 12) * 18}px;--rot:${i * 47}deg;--delay:${(i % 4) * 35}ms;--piece:${["#e77b43", "#2e7d5b", "#c69722", "#2b3a5c"][i % 4]}"></i>`).join("")}</div>${popoSvg("happy")}<span class="eyebrow">${ROUTES[r.route].title} · 여행 완료</span><h1>잘 다녀왔어요!</h1><div class="result-stars" role="img" aria-label="별 ${stars}개">${railSvg(`award-stars-${stars}`)}</div><div class="panel"><div class="stamps" aria-label="이번 운행 스탬프">${r.results.map((x) => `<span class="result-stamp" role="img" aria-label="${x === 2 ? "혼자 도착" : "도움받아 도착"}">${railSvg(x === 2 ? "stamp-full" : "stamp-half")}</span>`).join("")}</div><div class="result-stats"><div><strong>${r.results.length}</strong><span>도착한 승차권</span></div><div><strong>${clean}</strong><span>혼자 도착 ●</span></div><div><strong>${r.results.length - clean}</strong><span>도움받아 도착 ◐</span></div></div></div><p>우리가 지나온 역이 하나의 선율이 됐어요.</p>${btn("melody", "이번 여행 선율 듣기 " + svgIcon("play"), "secondary")}<div class="row">${btn(`start-${r.route}`, "다시 운행하기", "primary")}${btn("routes", "다른 노선 둘러보기")}</div><p class="small muted">전부 ●이면 별 2개, 세기 도움도 끄고 완주하면 별 3개예요.</p></div></section>`;
   }
   return "";
 }

@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { join, relative } from "node:path";
 
 export default defineConfig({
   plugins: [
@@ -9,10 +10,21 @@ export default defineConfig({
     {
       name: "drive-cache-version",
       closeBundle() {
-        const hash = createHash("sha256")
-          .update(readFileSync("dist/index.html"))
-          .digest("hex")
-          .slice(0, 12);
+        // Media bytes participate in the version: changing an illustration must
+        // produce a fresh offline cache even when application code is unchanged.
+        const files = (directory: string): string[] =>
+          readdirSync(directory).flatMap((name) => {
+            const path = join(directory, name);
+            return statSync(path).isDirectory() ? files(path) : [path];
+          });
+        const digest = createHash("sha256");
+        for (const file of files("dist")
+          .filter((file) => file !== join("dist", "sw.js"))
+          .sort()) {
+          digest.update(relative("dist", file));
+          digest.update(readFileSync(file));
+        }
+        const hash = digest.digest("hex").slice(0, 12);
         const worker = readFileSync("dist/sw.js", "utf8").replace("__BUILD_ID__", hash);
         writeFileSync("dist/sw.js", worker);
       },

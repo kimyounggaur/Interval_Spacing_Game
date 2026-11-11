@@ -10,6 +10,14 @@ import {
 } from "../theory";
 import type { Ticket } from "../game/generator";
 import type { Phase, Route } from "../game/types";
+import { ART } from "../assets/railway/art";
+import locomotiveArt from "../assets/railway/vector/locomotive-right.svg?raw";
+import naturalArt from "../assets/railway/vector/station-natural.svg?raw";
+import centralArt from "../assets/railway/vector/station-central.svg?raw";
+import tunnelArt from "../assets/railway/vector/tunnel-black.svg?raw";
+import flagArt from "../assets/railway/vector/destination-flag.svg?raw";
+import leftBufferArt from "../assets/railway/vector/buffer-left.svg?raw";
+import rightBufferArt from "../assets/railway/vector/buffer-right.svg?raw";
 import { popoSvg } from "./assets";
 import "./stage.css";
 
@@ -49,16 +57,28 @@ function el<K extends keyof SVGElementTagNameMap>(
   return node;
 }
 
-const scenery: Record<Route, string> = {
-  intro:
-    '<rect width="1000" height="600" fill="#cdeeee"/><circle cx="760" cy="125" r="46" fill="#fff2b4"/><path d="M0 300Q130 170 280 280T590 255T1000 260V600H0Z" fill="#a8cfb2"/><path d="M0 350Q140 240 330 330T690 305T1000 320V600H0Z" fill="#7eb48b"/><path d="M0 410Q180 330 340 400T700 380T1000 390V600H0Z" fill="#d4dfaa"/><g fill="#fdf6e3" opacity=".85"><path d="M70 130q15-22 35-8 17-26 42-4 33-2 33 17H70Z"/><path d="M390 85q15-22 35-8 17-26 42-4 33-2 33 17H390Z"/></g><g stroke="#366f4f" stroke-width="5" fill="#5e9568"><path d="M70 335v-84m0 10-30 45h60zM900 335v-75m0 10-27 40h54z"/></g><g fill="#f9edb7"><circle cx="190" cy="405" r="3"/><circle cx="220" cy="422" r="3"/><circle cx="805" cy="413" r="3"/></g>',
-  basic:
-    '<rect width="1000" height="600" fill="#cdeeee"/><circle cx="800" cy="85" r="41" fill="#fff2ba"/><path d="M0 295Q170 170 370 270T750 240T1000 260V600H0Z" fill="#a7c9b5"/><path d="M0 355Q220 265 470 330T1000 295V600H0Z" fill="#90bca0"/><g stroke="#8b634b" stroke-width="3"><path d="M100 335v-92h96v92" fill="#efd4a1"/><path d="m89 247 60-53 60 53Z" fill="#b36f54"/><path d="M280 335V220h90v115" fill="#f6e7bd"/><path d="m269 225 56-43 56 43Z" fill="#d69268"/><path d="M700 330V224h106v106" fill="#efdfb5"/><path d="m687 229 66-52 66 52Z" fill="#9b6f59"/></g><g fill="#577c7b"><path d="M119 270h22v27h-22zM158 270h22v27h-22zM297 245h20v25h-20zM334 245h20v25h-20zM720 251h22v27h-22zM764 251h22v27h-22z"/></g><path d="M0 400Q280 320 500 380T1000 380V600H0Z" fill="#cee0b0"/>',
-  full: '<rect width="1000" height="600" fill="#efd1b8"/><circle cx="765" cy="180" r="70" fill="#efad69"/><path d="m0 350 160-235 165 210 160-245 200 255 150-195 165 210V600H0Z" fill="#a2a8ab"/><path d="m0 405 220-250 190 218 150-210 190 225 140-235 110 212V600H0Z" fill="#7a9694"/><path d="M0 435Q160 330 350 400T740 380T1000 390V600H0Z" fill="#5f8372"/><g stroke="#50745f" stroke-width="5" fill="#60836b"><path d="M80 350V230m0 5-35 58h70zm0 35-42 65h84zM920 330V220m0 5-35 58h70zm0 35-42 65h84z"/></g><path d="M0 485Q250 390 480 445T1000 425V600H0Z" fill="#bbc59e"/>',
-  ear: '<rect width="1000" height="600" fill="#24334e"/><circle cx="795" cy="105" r="35" fill="#f9e9b6"/><circle cx="808" cy="93" r="32" fill="#24334e"/><path d="m0 330 170-170 140 145 180-170 170 185 170-170 170 190V600H0Z" fill="#3b5361"/><path d="M0 390Q200 280 390 360T760 340T1000 360V600H0Z" fill="#45695f"/><path d="M0 440Q200 370 450 415T1000 395V600H0Z" fill="#759581"/><g fill="#fff0bd"><circle cx="120" cy="75" r="2"/><circle cx="230" cy="150" r="2.5"/><circle cx="410" cy="60" r="2"/><circle cx="550" cy="130" r="2"/><circle cx="670" cy="65" r="2.5"/><circle cx="930" cy="190" r="2"/></g>',
-  mixed:
-    '<rect width="1000" height="600" fill="#d0ddd9"/><circle cx="690" cy="195" r="57" fill="#f3d7ac"/><path d="M0 300Q200 180 370 285T750 260T1000 270V420H0Z" fill="#91afb0"/><path d="M0 345Q200 260 430 325T1000 300V460H0Z" fill="#739b9c"/><path d="M0 365h1000v235H0Z" fill="#a2c8c3"/><g fill="none" stroke="#e4eee0" stroke-width="3" opacity=".7"><path d="M30 430h170m85 35h220m110-45h180m-680 105h240m380 15h190"/></g><path d="M0 390h1000v20H0z" fill="#b3b8a4"/><g fill="none" stroke="#799383" stroke-width="10"><path d="M70 410v120m0-45q85-90 170 0m0-75v120m0-45q85-90 170 0m0-75v120m0-45q85-90 170 0m0-75v120m0-45q85-90 170 0m0-75v120m0-45q85-90 170 0m0-75v120"/></g>',
-};
+// Mount the supplied artwork once. IDs stay local to the stage, and repeated
+// stations reuse symbols instead of duplicating hundreds of drawing nodes.
+function mountArtwork(raw: string, parent: SVGElement, prefix: string): void {
+  parent.innerHTML = raw
+    .slice(raw.indexOf(">") + 1, raw.lastIndexOf("</svg>"))
+    .replace(/<title\b[^>]*>[\s\S]*?<\/title>/g, "")
+    .replace(/id="([^"]+)"/g, `id="${prefix}-$1"`)
+    .replace(/url\(#([^)]+)\)/g, `url(#${prefix}-$1)`);
+}
+function artSymbol(raw: string, defs: SVGDefsElement, id: string): string {
+  const node = el(
+    "symbol",
+    {
+      id,
+      viewBox: raw.match(/viewBox="([^"]+)"/)?.[1] ?? "0 0 64 80",
+      preserveAspectRatio: "none",
+    },
+    defs,
+  );
+  mountArtwork(raw, node, id);
+  return `#${id}`;
+}
 
 export function buildStage(host: HTMLElement): {
   element: HTMLElement;
@@ -72,12 +92,12 @@ export function buildStage(host: HTMLElement): {
   const svg = document.createElementNS(NS, "svg");
   attrs(svg, { "aria-hidden": "true", focusable: "false", id: "stage-svg" });
   host.append(svg);
-  const background = el("g", { class: "stage-scenery" }, svg);
-  const backgrounds = (Object.keys(scenery) as Route[]).map((route) => {
-    const g = el("g", { "data-scenery": route }, background);
-    g.innerHTML = scenery[route];
-    return { route, node: g };
-  });
+  const defs = el("defs", {}, svg);
+  const stationSymbols = {
+    natural: artSymbol(naturalArt, defs, "stage-station-natural"),
+    central: artSymbol(centralArt, defs, "stage-station-central"),
+    tunnel: artSymbol(tunnelArt, defs, "stage-tunnel-black"),
+  };
   const legend = el("text", { x: 12, y: 22, class: "stage-legend" }, svg);
   const world = el("g", { id: "stage-world", class: "stage-world" }, svg);
   const railG = el("g", {}, world);
@@ -87,7 +107,7 @@ export function buildStage(host: HTMLElement): {
   const rails = [el("rect", { fill: "#6b5138" }, railG), el("rect", { fill: "#a28c6c" }, railG)];
   const tiles: SVGRectElement[] = [];
   const names: SVGTextElement[] = [];
-  const arches: SVGPathElement[] = [];
+  const stationArt: SVGUseElement[] = [];
   const badges: SVGGElement[] = [];
   const hops: SVGGElement[] = [];
   const sleepers: SVGRectElement[] = [];
@@ -105,17 +125,26 @@ export function buildStage(host: HTMLElement): {
         tileG,
       ),
     );
+    stationArt.push(
+      el(
+        "use",
+        {
+          href:
+            i === 12
+              ? stationSymbols.central
+              : white
+                ? stationSymbols.natural
+                : stationSymbols.tunnel,
+          "data-asset": i === 12 ? "station-central" : white ? "station-natural" : "tunnel-black",
+          class: "station-art",
+        },
+        tileG,
+      ),
+    );
     const name = el("text", { class: "station-name" }, tileG);
     const naturalName = spellings(48 + i, 0)[0];
     name.textContent = white && naturalName ? noteKo(naturalName) : "";
     names.push(name);
-    arches.push(
-      el(
-        "path",
-        { fill: "none", stroke: "#a1adbf", "stroke-width": 1, opacity: white ? 0 : 0.7 },
-        tileG,
-      ),
-    );
     const badge = el("g", { class: "stage-badge" }, badgeG);
     el("circle", { r: 9.3 }, badge);
     el("text", {}, badge);
@@ -129,53 +158,36 @@ export function buildStage(host: HTMLElement): {
     }
   }
   const buffers = [
-    el(
-      "path",
-      { stroke: "#6b5138", "stroke-width": 4, fill: "none", "stroke-linecap": "round" },
-      world,
-    ),
-    el(
-      "path",
-      { stroke: "#6b5138", "stroke-width": 4, fill: "none", "stroke-linecap": "round" },
-      world,
-    ),
+    el("g", { "data-asset": "buffer-left" }, world),
+    el("g", { "data-asset": "buffer-right" }, world),
   ];
-  const flag = el("g", { class: "stage-flag", id: "stage-flag" }, world);
-  el("line", { x1: 0, y1: -3, x2: 0, y2: -51, stroke: "#6b5138", "stroke-width": 2.5 }, flag);
-  el("path", { d: "M0-51 19-44 0-37Z", fill: "#b33c38" }, flag);
+  mountArtwork(leftBufferArt, buffers[0]!, "stage-buffer-left");
+  mountArtwork(rightBufferArt, buffers[1]!, "stage-buffer-right");
+  const flag = el(
+    "g",
+    { class: "stage-flag", id: "stage-flag", "data-asset": "destination-flag" },
+    world,
+  );
+  const flagDrawing = el("g", { transform: "translate(-4 -51) scale(.64)" }, flag);
+  mountArtwork(flagArt, flagDrawing, "stage-destination-flag");
   const train = el("g", { id: "train", class: "stage-train", "data-testid": "train" }, world);
-  const body = el("g", { id: "train-body" }, train);
-  el("path", { d: "M-25-4h49l5 5h-58Z", fill: "#26384b" }, body);
-  el("rect", { x: -24, y: -30, width: 19, height: 26, rx: 3, fill: "#bb5d37" }, body);
-  el("path", { d: "M-27-31q13-7 25 0v3h-25Z", fill: "#24354a" }, body);
-  el("rect", { x: -20, y: -26, width: 11, height: 11, rx: 2, fill: "#fff3ca" }, body);
-  el("path", { d: "M-15-26v11m-5-5h11", stroke: "#c39261", "stroke-width": 1 }, body);
-  el("rect", { x: -7, y: -22, width: 31, height: 17, rx: 7, fill: "#e77b43" }, body);
-  el(
-    "path",
-    { d: "M-1-18h18", stroke: "#f4ae67", "stroke-width": 3, "stroke-linecap": "round" },
-    body,
-  );
-  el("rect", { x: 12, y: -34, width: 7, height: 14, rx: 2, fill: "#29394d" }, body);
-  el("rect", { x: 10, y: -36, width: 11, height: 4, rx: 1.5, fill: "#29394d" }, body);
-  el(
-    "circle",
-    { cx: 24, cy: -13, r: 4, fill: "#f1ca62", stroke: "#976133", "stroke-width": 1.5 },
-    body,
-  );
-  el("path", { d: "m25-6 6 6H21Z", fill: "#ab5033" }, body);
-  const wheels = [-17, -2, 14].map((cx) => {
-    const g = el("g", { transform: `translate(${cx} -3)` }, body);
-    el("circle", { r: 6, fill: "#25374b", stroke: "#fdf6e3", "stroke-width": 1 }, g);
-    const spokes = el("g", {}, g);
-    el("path", { d: "M-4 0h8M0-4v8", stroke: "#8d9b94", "stroke-width": 1.3 }, spokes);
-    el("circle", { r: 1.7, fill: "#e9bd59" }, spokes);
-    return spokes;
-  });
-  el("path", { d: "M-17-3h31", stroke: "#f0d1a5", "stroke-width": 1.7 }, body);
+  const body = el("g", { id: "train-body", "data-asset": "locomotive-right" }, train);
+  const locomotive = el("g", { transform: "translate(-33 -35) scale(.26)" }, body);
+  mountArtwork(locomotiveArt, locomotive, "stage-locomotive");
+  const wheels = Array.from(locomotive.querySelectorAll<SVGGElement>("g.wheel")).map((wheel) => ({
+    node: wheel,
+    base: wheel.getAttribute("transform") ?? "",
+  }));
+  function rotateWheels(angle: number): void {
+    wheels.forEach(({ node, base }) => node.setAttribute("transform", `${base} rotate(${angle})`));
+  }
   const puffs = [
-    el("circle", { class: "stage-puff", cx: 15, cy: -42, r: 5, fill: "#fffdf1", opacity: 0 }, body),
-    el("circle", { class: "stage-puff", cx: 9, cy: -49, r: 4, fill: "#fffdf1", opacity: 0 }, body),
+    el("circle", { class: "stage-puff", cx: 15, cy: -32, r: 4, fill: "#fff7e6", opacity: 0 }, body),
+    el(
+      "circle",
+      { class: "stage-puff", cx: 9, cy: -39, r: 3.5, fill: "#fff7e6", opacity: 0 },
+      body,
+    ),
   ];
   const bubble = el("g", { class: "stage-bubble", id: "bubble" }, world);
   const bubbleRect = el("rect", { y: -14, height: 28, rx: 10 }, bubble);
@@ -228,24 +240,27 @@ export function buildStage(host: HTMLElement): {
     const yR = clamp(Math.round(height * 0.52), 110, Math.round(height - 98));
     geo = { ...geo, W, H: height, yR, padX: (width - vis * W) / 2, vis };
     attrs(svg, { viewBox: `0 0 ${width} ${height}` });
-    attrs(background, { transform: `scale(${width / 1000} ${height / 600})` });
     rails.forEach((rail, k) => attrs(rail, { x: -W, y: yR + k * 5, width: 27 * W, height: 3 - k }));
     for (let i = 0; i < 25; i++) {
       const x = i * W;
-      const white = isWhitePc(48 + i);
       attrs(sleepers[i]!, { x: x + W / 2 - 2.5, y: yR - 2, width: 5, height: 11 });
       attrs(tiles[i]!, {
         x: x + 1.5,
-        y: yR + (white ? 12 : 17),
+        y: yR + 11,
         width: W - 3,
-        height: white ? 33 : 24,
+        height: 35,
       });
       attrs(names[i]!, {
         x: x + W / 2,
         y: yR + 29,
         "font-size": clamp(Math.round(W * 0.5), 12, 16),
       });
-      attrs(arches[i]!, { d: `M${x + 5} ${yR + 37}v-8q${W / 2 - 5} -15 ${W - 10} 0v8` });
+      attrs(stationArt[i]!, {
+        x: x + 1.5,
+        y: yR + (i === 12 ? 3 : 12),
+        width: W - 3,
+        height: i === 12 ? 44 : 33,
+      });
       attrs(badges[i]!, { transform: `translate(${x + W / 2} ${yR + 58})` });
       if (i < 24) {
         const h = hops[i]!;
@@ -258,8 +273,8 @@ export function buildStage(host: HTMLElement): {
         attrs(h.children[2] as SVGElement, { x: (x0 + x1) / 2, y: yR + 78 });
       }
     }
-    attrs(buffers[0]!, { d: `M1 ${yR - 7}v17m-5-13h10` });
-    attrs(buffers[1]!, { d: `M${25 * W - 1} ${yR - 7}v17m-5-13h10` });
+    attrs(buffers[0]!, { transform: `translate(-7 ${yR - 13}) scale(.23)` });
+    attrs(buffers[1]!, { transform: `translate(${25 * W - 9} ${yR - 13}) scale(.23)` });
     attrs(veilRect, { width, height });
     attrs(tunnelRim, {
       d: `M-10 ${height}V${height * 0.8}Q-10 -${height * 0.35} ${width / 2} 5Q${width + 10} -${height * 0.35} ${width + 10} ${height * 0.8}V${height}`,
@@ -277,9 +292,8 @@ export function buildStage(host: HTMLElement): {
     host.dataset.tunnel = String(next.tunnel ?? false);
     host.classList.toggle("dragging", !!next.dragging);
     host.dataset.phase = next.phase;
-    backgrounds.forEach(({ route, node }) =>
-      node.setAttribute("display", route === next.route ? "inline" : "none"),
-    );
+    host.dataset.poster = String(!t);
+    host.style.backgroundImage = `url("${t ? ART[next.route] : ART.hero}")`;
     const expression =
       next.phase === "show"
         ? "counting"
@@ -304,7 +318,7 @@ export function buildStage(host: HTMLElement): {
       (next.pos !== oldPos ? Math.sign(next.pos - oldPos) : t !== oldTicket ? dir : oldFace);
     body.setAttribute("transform", `scale(${(face || 1) * 0.88} 0.88)`);
     oldFace = face || 1;
-    wheels.forEach((wheel) => wheel.setAttribute("transform", `rotate(${next.fpos * 70})`));
+    rotateWheels(next.fpos * 70);
     if (next.pos !== oldPos) {
       puffs.forEach((puff, i) => {
         puff.classList.remove("go");
@@ -419,7 +433,7 @@ export function buildStage(host: HTMLElement): {
     const tx = (cell + 0.5) * geo.W;
     positionTrain(tx);
     body.setAttribute("transform", `scale(${phase < 1 ? 0.88 : -0.88} 0.88)`);
-    wheels.forEach((wheel) => wheel.setAttribute("transform", `rotate(${cell * 70})`));
+    rotateWheels(cell * 70);
     const label = spellings(48 + Math.round(cell), 1)
       .filter(isSimple)
       .map(noteKo)

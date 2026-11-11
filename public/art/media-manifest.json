@@ -1,0 +1,123 @@
+{
+  "pack": "Interval Railway Assets v1",
+  "prepared": "2026-11-11",
+  "source_library_file_id": "libfile_7c15e1d81048819189910a22ba352a1e",
+  "purpose": "Approved game artwork; resized and encoded only, never cropped or redrawn.",
+  "raster_count": 7,
+  "svg_count": 64,
+  "total_raster_bytes": 1243468,
+  "assets": [
+    {
+      "role": "hero",
+      "url": "/art/title-hero.webp",
+      "width": 1280,
+      "height": 853,
+      "bytes": 215022,
+      "sha256": "1b912c87245dbd8ed618cbdcdac74839bce75d21cc357f91867cc72b8c05aeb7",
+      "source": "Interval_Railway_Assets_v1_20261111/raster/title-hero.png",
+      "source_dimensions": [1536, 1024],
+      "source_sha256": "1e5f5891493402a158ef3f0d6d525fb8fc6d67436a4388db5f814147895d364c",
+      "encoding": {
+        "format": "webp",
+        "quality": 78,
+        "crop": false
+      }
+    },
+    {
+      "role": "map",
+      "url": "/art/route-map.webp",
+      "width": 1280,
+      "height": 853,
+      "bytes": 311854,
+      "sha256": "55924c0581a101eec718af95e4488240f2b3f90cd5e82f8a87c6431bdc380147",
+      "source": "Interval_Railway_Assets_v1_20261111/raster/route-map.png",
+      "source_dimensions": [1536, 1024],
+      "source_sha256": "b1f1386e7aea72756824a1d4d7d2ed9998a44367cb438a2ba99e0f8217518ce4",
+      "encoding": {
+        "format": "webp",
+        "quality": 78,
+        "crop": false
+      }
+    },
+    {
+      "role": "intro",
+      "url": "/art/meadow.webp",
+      "width": 1280,
+      "height": 549,
+      "bytes": 161832,
+      "sha256": "9d9cf8d2059435d1c4732ac8cdbe03ea481cf972edbd9e6a004d1efd156d3e59",
+      "source": "Interval_Railway_Assets_v1_20261111/raster/meadow.png",
+      "source_dimensions": [1915, 821],
+      "source_sha256": "72c20536f699be67f0163e17befae36429cc4d06ca06b00875113cc9566cbf9e",
+      "encoding": {
+        "format": "webp",
+        "quality": 78,
+        "crop": false
+      }
+    },
+    {
+      "role": "basic",
+      "url": "/art/village.webp",
+      "width": 1280,
+      "height": 549,
+      "bytes": 183554,
+      "sha256": "409ff99d56f6082a09c73572519045d667eac2d94dfdf28d39c50ab1597d2f68",
+      "source": "Interval_Railway_Assets_v1_20261111/raster/village.png",
+      "source_dimensions": [1915, 821],
+      "source_sha256": "555ea4531f7442803a5f8e683827463e61b38eb71334dd0cf3a4fe86b2d548d8",
+      "encoding": {
+        "format": "webp",
+        "quality": 78,
+        "crop": false
+      }
+    },
+    {
+      "role": "full",
+      "url": "/art/mountains.webp",
+      "width": 1280,
+      "height": 549,
+      "bytes": 136022,
+      "sha256": "691fed719557c85e684ce6e1ad6ab15fcb9fdee95f89637e49bdd3bbaaafe819",
+      "source": "Interval_Railway_Assets_v1_20261111/raster/mountains.png",
+      "source_dimensions": [1915, 821],
+      "source_sha256": "cfc018cff465d041e71f191cc3d035479bbdb5bb955b0b6c99793aa77d737cdc",
+      "encoding": {
+        "format": "webp",
+        "quality": 78,
+        "crop": false
+      }
+    },
+    {
+      "role": "ear",
+      "url": "/art/night-tunnel.webp",
+      "width": 1280,
+      "height": 549,
+      "bytes": 117420,
+      "sha256": "8e9a7e08e340d522acc505674de39235a614da9125e50d7a49641ab9a179b8ea",
+      "source": "Interval_Railway_Assets_v1_20261111/raster/night-tunnel.png",
+      "source_dimensions": [1915, 821],
+      "source_sha256": "fc20b460c90063af76f98d3e7d02394c396be6d74496b04671d17b01b071e07a",
+      "encoding": {
+        "format": "webp",
+        "quality": 78,
+        "crop": false
+      }
+    },
+    {
+      "role": "mixed",
+      "url": "/art/sea-bridge.webp",
+      "width": 1280,
+      "height": 549,
+      "bytes": 117764,
+      "sha256": "96ae7e6d1d4b4f5b78f4d09bdf801b6cb6d9d414e033617a14e89abca6d611a0",
+      "source": "Interval_Railway_Assets_v1_20261111/raster/sea-bridge.png",
+      "source_dimensions": [1915, 821],
+      "source_sha256": "ddd0a352f01e25dc7c12afa0d0744266ac85718d2a4fe4656f703b808d3fd910",
+      "encoding": {
+        "format": "webp",
+        "quality": 78,
+        "crop": false
+      }
+    }
+  ]
+}

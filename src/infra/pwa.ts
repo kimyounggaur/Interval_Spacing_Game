@@ -1,4 +1,6 @@
-/** Ready means the full self-contained production document is cached. */
+import { OFFLINE_ART } from "../assets/railway/art";
+
+/** Ready means the application document and every route illustration are cached. */
 export async function registerPwa(
   onReady: (ready: boolean) => void = () => undefined,
 ): Promise<void> {
@@ -9,8 +11,10 @@ export async function registerPwa(
     // This code runs once at startup, never in updatefound during a live run.
     registration.waiting?.postMessage({ type: "ACTIVATE_ON_LAUNCH" });
     await navigator.serviceWorker.ready;
-    const stored = await caches.match("/index.html");
-    onReady(Boolean(stored));
+    const stored = await Promise.all(
+      ["/index.html", ...OFFLINE_ART].map((url) => caches.match(url)),
+    );
+    onReady(stored.every(Boolean));
   } catch {
     // Browsers may block service workers or storage. Lessons still work online.
     onReady(false);

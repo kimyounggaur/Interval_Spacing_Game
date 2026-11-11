@@ -1,4 +1,4 @@
-const CACHE = "ijs-drive-__BUILD_ID__";
+const CACHE = "ijs-railway-__BUILD_ID__";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -7,6 +7,13 @@ const APP_SHELL = [
   "/icon-192.png",
   "/icon-512.png",
   "/apple-touch-icon.png",
+  "/art/title-hero.webp",
+  "/art/route-map.webp",
+  "/art/meadow.webp",
+  "/art/village.webp",
+  "/art/mountains.webp",
+  "/art/night-tunnel.webp",
+  "/art/sea-bridge.webp",
 ];
 
 self.addEventListener("install", (event) => {
