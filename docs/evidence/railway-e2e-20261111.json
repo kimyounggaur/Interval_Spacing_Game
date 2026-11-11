@@ -1,0 +1,459 @@
+{
+  "date": "2026-11-11T07:42:10.926Z",
+  "base": "http://127.0.0.1:4173",
+  "results": [
+    {
+      "id": "E-01",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 809
+    },
+    {
+      "id": "E-02",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 962
+    },
+    {
+      "id": "E-03",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 780
+    },
+    {
+      "id": "E-04",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 772
+    },
+    {
+      "id": "E-05",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 832
+    },
+    {
+      "id": "E-06",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 798
+    },
+    {
+      "id": "E-07",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 788
+    },
+    {
+      "id": "E-08",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 733
+    },
+    {
+      "id": "E-09",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1983
+    },
+    {
+      "id": "E-10",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 782
+    },
+    {
+      "id": "E-11",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 702
+    },
+    {
+      "id": "E-12",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1948
+    },
+    {
+      "id": "E-13",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1071
+    },
+    {
+      "id": "E-14",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 760
+    },
+    {
+      "id": "E-15",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 771
+    },
+    {
+      "id": "E-01",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 798
+    },
+    {
+      "id": "E-02",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 953
+    },
+    {
+      "id": "E-03",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 757
+    },
+    {
+      "id": "E-04",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 753
+    },
+    {
+      "id": "E-05",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 826
+    },
+    {
+      "id": "E-06",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 795
+    },
+    {
+      "id": "E-07",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 783
+    },
+    {
+      "id": "E-08",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 708
+    },
+    {
+      "id": "E-09",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1992
+    },
+    {
+      "id": "E-10",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 803
+    },
+    {
+      "id": "E-11",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 712
+    },
+    {
+      "id": "E-12",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1970
+    },
+    {
+      "id": "E-13",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1044
+    },
+    {
+      "id": "E-14",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 768
+    },
+    {
+      "id": "E-15",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 736
+    },
+    {
+      "id": "E-01",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 744
+    },
+    {
+      "id": "E-02",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 938
+    },
+    {
+      "id": "E-03",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 766
+    },
+    {
+      "id": "E-04",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 776
+    },
+    {
+      "id": "E-05",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 826
+    },
+    {
+      "id": "E-06",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 797
+    },
+    {
+      "id": "E-07",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 786
+    },
+    {
+      "id": "E-08",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 713
+    },
+    {
+      "id": "E-09",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1950
+    },
+    {
+      "id": "E-10",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 806
+    },
+    {
+      "id": "E-11",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 709
+    },
+    {
+      "id": "E-12",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1964
+    },
+    {
+      "id": "E-13",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1037
+    },
+    {
+      "id": "E-14",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 749
+    },
+    {
+      "id": "E-15",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 733
+    },
+    {
+      "id": "RUN-basic",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1423
+    },
+    {
+      "id": "RUN-full",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1671
+    },
+    {
+      "id": "RUN-ear",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1349
+    },
+    {
+      "id": "RUN-mixed",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1588
+    },
+    {
+      "id": "R-01",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 727
+    },
+    {
+      "id": "R-02",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 1365
+    },
+    {
+      "id": "R-03",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 909
+    },
+    {
+      "id": "TUTORIAL",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 803
+    },
+    {
+      "id": "WARMUP",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 846
+    },
+    {
+      "id": "SCREENSHOTS",
+      "viewport": "360x640",
+      "status": "PASS",
+      "milliseconds": 2275
+    },
+    {
+      "id": "RUN-basic",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1423
+    },
+    {
+      "id": "RUN-full",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1643
+    },
+    {
+      "id": "RUN-ear",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1384
+    },
+    {
+      "id": "RUN-mixed",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1718
+    },
+    {
+      "id": "R-01",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 734
+    },
+    {
+      "id": "R-02",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 1392
+    },
+    {
+      "id": "R-03",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 914
+    },
+    {
+      "id": "TUTORIAL",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 780
+    },
+    {
+      "id": "WARMUP",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 868
+    },
+    {
+      "id": "SCREENSHOTS",
+      "viewport": "390x664",
+      "status": "PASS",
+      "milliseconds": 2406
+    },
+    {
+      "id": "RUN-basic",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1336
+    },
+    {
+      "id": "RUN-full",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1626
+    },
+    {
+      "id": "RUN-ear",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1394
+    },
+    {
+      "id": "RUN-mixed",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1622
+    },
+    {
+      "id": "R-01",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 737
+    },
+    {
+      "id": "R-02",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 1408
+    },
+    {
+      "id": "R-03",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 900
+    },
+    {
+      "id": "TUTORIAL",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 792
+    },
+    {
+      "id": "WARMUP",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 846
+    },
+    {
+      "id": "SCREENSHOTS",
+      "viewport": "390x844",
+      "status": "PASS",
+      "milliseconds": 2314
+    }
+  ],
+  "ciRun": 42981058333,
+  "commit": "13978e5cc477c56dfa6e51e11dc2618e7a83e94f",
+  "artifactId": 13836844779
+}
