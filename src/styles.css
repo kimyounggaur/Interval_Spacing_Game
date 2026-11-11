@@ -803,7 +803,7 @@ svg {
     gap: 12px;
   }
   .hero [data-stage-slot] {
-    height: 180px;
+    height: 210px;
   }
   .hero h1 {
     font-size: 2.3rem;
