@@ -14,10 +14,17 @@ export const BOARD: readonly BoardCell[] = Array.from({ length: CELLS }, (_, idx
   const midi = BASE + idx;
   const names = spellings(midi).filter((note) => note.acc === 0 || !isWhitePc(midi));
   return {
-    idx, midi, pc: midi % 12,
+    idx,
+    midi,
+    pc: midi % 12,
     ko: names.map(noteKo).join(" / "),
-    en: names.map((note) => LETTER_EN[note.letter] + (note.acc === 1 ? "♯" : note.acc === -1 ? "♭" : "")).join(" / "),
-    isWhite: isWhitePc(midi), isStart: idx === 12,
+    en: names
+      .map((note) => LETTER_EN[note.letter] + (note.acc === 1 ? "♯" : note.acc === -1 ? "♭" : ""))
+      .join(" / "),
+    isWhite: isWhitePc(midi),
+    isStart: idx === 12,
   };
 });
-export const WHITE_CELLS: readonly number[] = BOARD.filter((cell) => cell.isWhite).map((cell) => cell.idx);
+export const WHITE_CELLS: readonly number[] = BOARD.filter((cell) => cell.isWhite).map(
+  (cell) => cell.idx,
+);

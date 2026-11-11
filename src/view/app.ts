@@ -64,6 +64,9 @@ export function createView(root: HTMLElement) {
   let currentModal: string | null = null;
   let previousFocus: HTMLElement | null = null;
   let lastLive = "";
+  let lastReadout = "";
+  let announcedTicket: Ticket | null = null;
+  let announcedPosition = -1;
   let renderedSettings: GameState["save"]["settings"] | null = null;
   function render(state: GameState, audioState: AudioState, offline: boolean, dragging = false) {
     root.dataset.motion = state.save.settings.motion;
@@ -126,10 +129,30 @@ export function createView(root: HTMLElement) {
       el("readout").textContent = message;
       el("readout").className =
         `readout ${state.phase === "verify" ? "ok" : state.mistakes && state.message ? "no" : ""}`;
-      if (lastLive !== message) {
-        el("live").textContent = message;
-        lastLive = message;
+      const stationName =
+        state.phase === "verify"
+          ? noteKo(t.targetNote)
+          : state.pos === t.start
+            ? noteKo(t.startNote)
+            : spellings(48 + state.pos, 1)
+                .filter(isSimple)
+                .map(noteKo)
+                .join(" / ");
+      const announcement =
+        announcedTicket !== t
+          ? `${t.title}. ${noteKo(t.startNote)}에서 출발해요. ${message}`
+          : announcedPosition !== state.pos
+            ? `${stationName} 역. ${message}`
+            : lastReadout !== message
+              ? message
+              : lastLive;
+      if (lastLive !== announcement) {
+        el("live").textContent = announcement;
+        lastLive = announcement;
       }
+      lastReadout = message;
+      announcedTicket = t;
+      announcedPosition = state.pos;
       const listening = t.kind === "ear" && !state.hunt && state.phase === "judge";
       el("ear-panel").hidden = !listening;
       el("ear-direction").hidden = state.earDirectionAnswered;

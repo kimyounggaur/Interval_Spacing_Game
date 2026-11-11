@@ -1,5 +1,7 @@
 /** Ready means the full self-contained production document is cached. */
-export async function registerPwa(onReady: (ready: boolean) => void = () => undefined): Promise<void> {
+export async function registerPwa(
+  onReady: (ready: boolean) => void = () => undefined,
+): Promise<void> {
   onReady(false);
   if (!("serviceWorker" in navigator) || !import.meta.env.PROD) return;
   try {

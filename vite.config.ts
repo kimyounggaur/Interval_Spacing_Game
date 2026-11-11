@@ -9,7 +9,10 @@ export default defineConfig({
     {
       name: "drive-cache-version",
       closeBundle() {
-        const hash = createHash("sha256").update(readFileSync("dist/index.html")).digest("hex").slice(0, 12);
+        const hash = createHash("sha256")
+          .update(readFileSync("dist/index.html"))
+          .digest("hex")
+          .slice(0, 12);
         const worker = readFileSync("dist/sw.js", "utf8").replace("__BUILD_ID__", hash);
         writeFileSync("dist/sw.js", worker);
       },

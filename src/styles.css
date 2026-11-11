@@ -420,7 +420,7 @@ svg {
   padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
     max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
   display: grid;
-  grid-template-rows: 44px 76px minmax(210px, 330px) minmax(44px, auto) 60px 44px;
+  grid-template-rows: 44px minmax(76px, auto) minmax(210px, 330px) minmax(44px, auto) 60px 44px;
   gap: 8px;
   align-content: space-between;
   max-width: 960px;
@@ -791,7 +791,7 @@ svg {
 }
 @media (max-height: 650px) {
   .run {
-    grid-template-rows: 44px 76px minmax(210px, 1fr) minmax(44px, auto) 60px 44px;
+    grid-template-rows: 44px minmax(76px, auto) minmax(210px, 1fr) minmax(44px, auto) 60px 44px;
     gap: 6px;
     align-content: stretch;
   }
@@ -896,5 +896,18 @@ svg {
   to {
     opacity: 0;
     transform: translate(var(--tx), 240px) rotate(var(--rot));
+  }
+}
+
+@media (max-height: 700px) {
+  .run {
+    gap: 6px;
+  }
+}
+@media (max-height: 650px) {
+  .run {
+    gap: 4px;
+    padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right))
+      max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
   }
 }

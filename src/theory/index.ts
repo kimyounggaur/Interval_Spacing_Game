@@ -14,12 +14,25 @@ export type Quality = "P" | "M" | "m" | "A" | "d" | "AA" | "dd";
 export type Interval = { num: number; quality: Quality; semis: number };
 export type DirectedInterval = Interval & { dir: Direction };
 const ACC: Record<Accidental, string> = { "-2": "♭♭", "-1": "♭", 0: "", 1: "♯", 2: "♯♯" };
-const Q_KO: Record<Quality, string> = { P: "완전", M: "장", m: "단", A: "증", d: "감", AA: "겹증", dd: "겹감" };
+const Q_KO: Record<Quality, string> = {
+  P: "완전",
+  M: "장",
+  m: "단",
+  A: "증",
+  d: "감",
+  AA: "겹증",
+  dd: "겹감",
+};
 const mod = (value: number, base: number): number => ((value % base) + base) % base;
 export const hz = (midi: number): number => 440 * 2 ** ((midi - 69) / 12);
-export const midiOf = (note: Note): number => 12 * (note.octave + 1) + LETTER_PC[note.letter]! + note.acc;
+export const midiOf = (note: Note): number =>
+  12 * (note.octave + 1) + LETTER_PC[note.letter]! + note.acc;
 export const dstep = (note: Note): number => 7 * note.octave + note.letter;
-export const natural = (step: number): Note => ({ letter: mod(step, 7) as Letter, acc: 0, octave: Math.floor(step / 7) });
+export const natural = (step: number): Note => ({
+  letter: mod(step, 7) as Letter,
+  acc: 0,
+  octave: Math.floor(step / 7),
+});
 export const isPerfectClass = (num: number): boolean => [0, 3, 4].includes(mod(num - 1, 7));
 export function refSemis(num: number): number {
   if (!Number.isInteger(num) || num < 1) throw new RangeError("도수는 1 이상의 정수여야 해요.");
@@ -62,19 +75,29 @@ export function transpose(a: Note, num: number, quality: Quality, dir: Direction
 }
 export function invert(iv: Pick<Interval, "num" | "quality">): Interval {
   if (iv.num < 1 || iv.num > 8) throw new RangeError("자리바꿈은 1~8도에서 할 수 있어요.");
-  const quality: Record<Quality, Quality> = { P: "P", M: "m", m: "M", A: "d", d: "A", AA: "dd", dd: "AA" };
+  const quality: Record<Quality, Quality> = {
+    P: "P",
+    M: "m",
+    m: "M",
+    A: "d",
+    d: "A",
+    AA: "dd",
+    dd: "AA",
+  };
   return intervalOf(9 - iv.num, quality[iv.quality])!;
 }
 export const noteKo = (note: Note): string => LETTER_KO[note.letter] + ACC[note.acc];
 export const noteEn = (note: Note): string => LETTER_EN[note.letter] + ACC[note.acc] + note.octave;
-export const nameKo = (iv: Pick<Interval, "num" | "quality">): string => Q_KO[iv.quality] + iv.num + "도";
+export const nameKo = (iv: Pick<Interval, "num" | "quality">): string =>
+  Q_KO[iv.quality] + iv.num + "도";
 export function spellings(midi: number, maxAcc = 1): Note[] {
   const center = Math.floor(((midi - 12) / 12) * 7);
   const notes: Note[] = [];
   for (let step = center - 3; step <= center + 4; step++) {
     const n = natural(step);
     const acc = midi - midiOf(n);
-    if (Number.isInteger(acc) && Math.abs(acc) <= Math.min(2, maxAcc)) notes.push({ ...n, acc: acc as Accidental });
+    if (Number.isInteger(acc) && Math.abs(acc) <= Math.min(2, maxAcc))
+      notes.push({ ...n, acc: acc as Accidental });
   }
   return notes;
 }
@@ -89,9 +112,15 @@ export function commonBySemis(semis: number): Interval[] {
   return basic.length ? basic : intervals.filter((iv) => iv.quality === "A" || iv.quality === "d");
 }
 export const isWhitePc = (midi: number): boolean => LETTER_PC.includes(mod(midi, 12));
-export const isSimple = (note: Note): boolean => Math.abs(note.acc) <= 1 && (note.acc === 0 || !isWhitePc(midiOf(note)));
+export const isSimple = (note: Note): boolean =>
+  Math.abs(note.acc) <= 1 && (note.acc === 0 || !isWhitePc(midiOf(note)));
 /** Badge positions follow letter steps, not chromatic keyboard cells. */
-export function letterCells(startNote: Note, dir: Direction, start: number, to: number): { cell: number; n: number }[] {
+export function letterCells(
+  startNote: Note,
+  dir: Direction,
+  start: number,
+  to: number,
+): { cell: number; n: number }[] {
   const cells = [{ cell: start, n: 1 }];
   if ((to - start) * dir < 0) return cells;
   for (let k = 1; k < 16; k++) {

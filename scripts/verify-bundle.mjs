@@ -13,8 +13,21 @@ assert.doesNotMatch(html, /(?:src|href)=["']https?:\/\//i, "No remote asset refe
 assert.doesNotMatch(html, /@import\s+(?:url\()?\s*["']?https?:/i, "No external font imports");
 assert.doesNotMatch(html, /url\(["']?https?:/i, "No external CSS assets");
 assert.ok(!readdirSync("dist").includes("assets"), "No split JS/CSS assets directory");
-for (const file of ["manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "sw.js"]) {
+for (const file of [
+  "manifest.webmanifest",
+  "icon.svg",
+  "icon-192.png",
+  "icon-512.png",
+  "apple-touch-icon.png",
+  "sw.js",
+]) {
   assert.ok(statSync(`dist/${file}`).size > 0, `${file} is missing`);
 }
-assert.doesNotMatch(readFileSync("dist/sw.js", "utf8"), /__BUILD_ID__/, "Cache version must match this build");
-console.log(`bundle PASS: ${bytes} bytes, gzip ${gzipBytes} bytes; self-contained assets and PWA shell present`);
+assert.doesNotMatch(
+  readFileSync("dist/sw.js", "utf8"),
+  /__BUILD_ID__/,
+  "Cache version must match this build",
+);
+console.log(
+  `bundle PASS: ${bytes} bytes, gzip ${gzipBytes} bytes; self-contained assets and PWA shell present`,
+);
