@@ -14,6 +14,8 @@ import type { AudioState } from "../audio/engine";
 import { buildStage } from "./stage";
 import { popoSvg, svgIcon, railSvg, railAssetUrl } from "./assets";
 import { ART } from "../assets/railway/art";
+import { installRulebook, rulebookButton } from "./rulebook";
+import "./rulebook.css";
 
 const esc = (value: string): string =>
   value.replace(
@@ -25,7 +27,7 @@ const btn = (action: string, text: string, cls = "outline"): string =>
 const icon = (action: string, label: string, name: Parameters<typeof svgIcon>[0]): string =>
   `<button class="icon-btn" data-action="${action}" aria-label="${label}">${svgIcon(name)}</button>`;
 const head = (title: string): string =>
-  `<header class="page-head">${icon("back", "뒤로", "back")}<h2 tabindex="-1">${title}</h2>${icon("notebook", "음정 수첩", "notebook")}${icon("settings", "설정", "settings")}</header>`;
+  `<header class="page-head">${icon("back", "뒤로", "back")}<h2 tabindex="-1">${title}</h2>${rulebookButton()}${icon("notebook", "음정 수첩", "notebook")}${icon("settings", "설정", "settings")}</header>`;
 const stamp = (value: number | undefined): string => (value === 2 ? "●" : value === 1 ? "◐" : "○");
 const kindNames: Record<Ticket["kind"], string> = {
   degree: "도수 승차권",
@@ -45,7 +47,7 @@ export function createView(root: HTMLElement) {
     root.style.setProperty(`--star-${name}`, `url("${railAssetUrl(`star-${name}`)}")`);
 
   root.innerHTML = `<div id="screen" class="shell" data-screen="title" data-railway="true"><div id="pages"></div><section id="run" class="run" aria-label="기차 운전" hidden>
-    <header class="hud"><span id="hud-title" class="hud-title"></span><div id="hud-dots" class="hud-dots" aria-label="승차권 진행"></div><button data-action="sound" id="sound-chip" class="sound-chip">소리 켜기</button>${icon("pause", "일시정지", "pause")}</header>
+    <header class="hud"><span id="hud-title" class="hud-title"></span><div id="hud-dots" class="hud-dots" aria-label="승차권 진행"></div><button data-action="sound" id="sound-chip" class="sound-chip">소리 켜기</button>${rulebookButton()}${icon("pause", "일시정지", "pause")}</header>
     <section id="ticket" class="ticket" aria-label="승차권"><div class="ticket-stripe"></div><div class="ticket-main"><span id="ticket-kind" class="ticket-kind"></span><strong id="ticket-title" class="ticket-title"></strong><span id="ticket-sub" class="ticket-sub"></span></div><div class="ticket-stub"><small>출발</small><b id="ticket-from"></b></div></section>
     <div id="run-stage-slot" class="stage-slot"><div id="stage"></div><div id="ear-panel" class="ear-panel" hidden><div id="ear-direction" class="ear-direction"><p>두 번째 음은 어떻게 움직였나요?</p><div class="row">${btn("direction-up", "위로 ↑", "primary")}${btn("direction-down", "아래로 ↓", "outline")}</div></div><div id="ear-choices" class="ear-choices"></div></div></div>
     <div id="readout" class="readout"></div><div id="controls" class="controls"><button data-control="0" aria-label="한 칸 아래로">◀</button><button data-control="1">도착!</button><button data-control="2" aria-label="한 칸 위로">▶</button></div>
@@ -53,6 +55,7 @@ export function createView(root: HTMLElement) {
     <div id="live" class="sr" aria-live="polite" aria-atomic="true"></div><div id="toast" class="toast" role="status" hidden></div><dialog id="modal" class="modal" aria-labelledby="modal-title"></dialog><div class="rotation"><h2>세로 화면으로 돌려 주세요</h2><p>모든 역과 운전 단추를 함께 볼 수 있어요.</p></div>`;
   const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
     root.querySelector<T>(`#${id}`)!;
+  installRulebook(root);
   const stage = buildStage(el("stage"));
   const pages = el("pages"),
     run = el("run"),
@@ -277,7 +280,7 @@ export function createView(root: HTMLElement) {
 }
 function screenTemplate(state: GameState): string {
   if (state.screen === "title")
-    return `<section class="page hero"><header class="hero-top"><span class="brand">도레미 기차 여행</span><div class="row">${icon("notebook", "음정 수첩", "notebook")}${icon("settings", "설정", "settings")}</div></header><div class="hero-copy"><span class="eyebrow">한 역씩, 귀와 눈으로</span><h1 tabindex="-1">음정 정거장</h1><p>기차를 직접 몰며<br>두 음 사이의 거리를 발견해요.</p></div><div data-stage-slot></div><div class="hero-actions">${btn("routes", "출발하기 " + svgIcon("play"), "primary")}${state.save.activeRun ? btn("resume", "하던 여행 이어하기", "secondary") : btn("tutorial", "포포와 운전 연습", "outline")}</div><span class="hero-foot">소리 · 도수 · 반음이 하나로 이어지는 여행</span></section>`;
+    return `<section class="page hero"><header class="hero-top"><span class="brand">도레미 기차 여행</span><div class="row">${rulebookButton()}${icon("notebook", "음정 수첩", "notebook")}${icon("settings", "설정", "settings")}</div></header><div class="hero-copy"><span class="eyebrow">한 역씩, 귀와 눈으로</span><h1 tabindex="-1">음정 정거장</h1><p>기차를 직접 몰며<br>두 음 사이의 거리를 발견해요.</p></div><div data-stage-slot></div><div class="hero-actions">${btn("routes", "출발하기 " + svgIcon("play"), "primary")}${state.save.activeRun ? btn("resume", "하던 여행 이어하기", "secondary") : btn("tutorial", "포포와 운전 연습", "outline")}</div><span class="hero-foot">소리 · 도수 · 반음이 하나로 이어지는 여행</span></section>`;
   if (state.screen === "routes")
     return `<section class="page">${head("오늘은 어느 노선으로?")}<div class="route-intro">${popoSvg("default")}<div><p>한 역씩 움직이며 직접 세어 봐요.</p><span class="small muted">● 혼자 도착 · ◐ 도움받아 도착</span></div></div><div class="routes">${ROUTE_IDS.map(
       (id) => {
@@ -306,7 +309,7 @@ function screenTemplate(state: GameState): string {
     const r = state.run,
       clean = r.results.filter((x) => x === 2).length,
       stars = runStars(r.results, r.assistOff);
-    return `<section class="page">${head("종착역 도착")}<div class="result"><div class="confetti" aria-hidden="true">${Array.from({ length: 24 }, (_, i) => `<i style="--tx:${(i - 12) * 18}px;--rot:${i * 47}deg;--delay:${(i % 4) * 35}ms;--piece:${["#e77b43", "#2e7d5b", "#c69722", "#2b3a5c"][i % 4]}"></i>`).join("")}</div>${popoSvg("happy")}<span class="eyebrow">${ROUTES[r.route].title} · 여행 완료</span><h1>잘 다녀왔어요!</h1><div class="result-stars" role="img" aria-label="별 ${stars}개">${railSvg(`award-stars-${stars}`)}</div><div class="panel"><div class="stamps" aria-label="이번 운행 스탬프">${r.results.map((x) => `<span class="result-stamp" role="img" aria-label="${x === 2 ? "혼자 도착" : "도움받아 도착"}">${railSvg(x === 2 ? "stamp-full" : "stamp-half")}</span>`).join("")}</div><div class="result-stats"><div><strong>${r.results.length}</strong><span>도착한 승차권</span></div><div><strong>${clean}</strong><span>혼자 도착 ●</span></div><div><strong>${r.results.length - clean}</strong><span>도움받아 도착 ◐</span></div></div></div><p>우리가 지나온 역이 하나의 선율이 됐어요.</p>${btn("melody", "이번 여행 선율 듣기 " + svgIcon("play"), "secondary")}<div class="row">${btn(`start-${r.route}`, "다시 운행하기", "primary")}${btn("routes", "다른 노선 둘러보기")}</div><p class="small muted">전부 ●이면 별 2개, 세기 도움도 끄고 완주하면 별 3개예요.</p></div></section>`;
+    return `<section class="page">${head("종착역 도착")}<div class="result"><div class="confetti" aria-hidden="true">${Array.from({ length: 24 }, (_, i) => `<i style="--tx:${(i - 12) * 18}px;--rot:${i * 47}deg;--delay:${(i % 4) * 35}ms;--piece:${["#e77b43", "#2e7d5b", "#c69722", "#2b3a5c"][i % 4]}"></i>`).join("")}</div>${popoSvg("happy")}<span class="eyebrow">${ROUTES[r.route].title} · 여행 완료</span><h1>잘 다녀왔어요!</h1><div class="result-stars" role="img" aria-label="별 ${stars}개">${railSvg(`award-stars-${stars}`)}</div><div class="panel"><div class="stamps" aria-label="이번 운행 스탬프">${r.results.map((x) => `<span class="result-stamp" role="img" aria-label="${x === 2 ? "혼자 도착" : "도움받아 도착"}">${railSvg(x === 2 ? "stamp-full" : "stamp-half")}</span>`).join("")}</div><div class="result-stats"><div><strong>${r.results.length}</strong><span>도착한 승차권</span></div><div><strong>${clean}</strong><span>혼자 도착 ●</span></div><div><strong>${r.results.length - clean}</strong><span>도움받아 도착 ◐</span></div></div></div><p>우리가 지나온 역이 하나의 선율이 됐어요.</p>${btn("melody", "이번 여행 선율 듣기 " + svgIcon("play"), "secondary")}<div class="row">${btn(`start-${r.route}`, "다시 운행하기", "primary")}${btn("routes", "다른 노선 둘러보기")}</div><p class="small muted">혼자 도착이 80% 이상이면 별 2개, 전부 혼자 도착하고 운행 내내 세기 도움을 끄면 별 3개예요.</p></div></section>`;
   }
   return "";
 }

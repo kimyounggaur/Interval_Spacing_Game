@@ -1,0 +1,229 @@
+.rulebook-button {
+  flex: none;
+  width: 52px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 4px;
+  color: #203846;
+  font-size: 0.8rem;
+  font-weight: 850;
+  border: 1px solid #86672f;
+  border-radius: 8px;
+  background: #fff7e6;
+  box-shadow:
+    inset 0 0 0 2px #fff8e9,
+    0 2px 0 #785c3b40;
+}
+.rulebook {
+  width: min(920px, calc(100vw - 24px));
+  max-width: none;
+  max-height: min(92dvh, 1000px);
+  padding: 0;
+  border: 2px solid #9a7438;
+  border-radius: 12px;
+  background: #f6ead0;
+  color: #203846;
+  box-shadow: 0 18px 70px #0d201dc9;
+  overflow: auto;
+}
+.rulebook::backdrop {
+  background: #112927c7;
+}
+.rulebook-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px clamp(16px, 4vw, 36px);
+  background: #f8ecd4f5;
+  border-bottom: 1px solid #b59661;
+  box-shadow: 0 3px 12px #48362222;
+}
+.rulebook-header h2 {
+  font-size: clamp(1.2rem, 4vw, 1.65rem);
+  line-height: 1.25;
+}
+.rulebook-kicker {
+  display: block;
+  color: #49624b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+.rulebook-close {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  color: #203846;
+  border: 1px solid #90703a;
+  border-radius: 8px;
+  background: #fff7e6;
+}
+.rulebook-body {
+  padding: 20px clamp(16px, 4vw, 44px) 36px;
+}
+.rulebook-cover {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 18px;
+  text-align: center;
+  color: #203846;
+  background: #fff8e8;
+  border: 1px solid #ae874a;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 4px #f3dfb5;
+}
+.rulebook-cover-art {
+  display: block;
+  width: min(100%, 440px);
+  height: auto;
+  border-radius: 5px;
+}
+.rulebook-cover span {
+  margin-top: 4px;
+  color: #365b4a;
+  font-size: 0.875rem;
+  font-weight: 750;
+}
+.rulebook-cover strong {
+  font-family: "Black Han Sans", system-ui, sans-serif;
+  font-size: clamp(1.65rem, 6vw, 2.4rem);
+  font-weight: 400;
+}
+.rulebook-cover p {
+  margin: 0;
+}
+.rulebook-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 24px;
+}
+.rulebook-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 9px 13px;
+  color: #204b3d;
+  border: 1px solid #a48a56;
+  border-radius: 22px;
+  background: #fff8e9;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+.rulebook-section {
+  scroll-margin-top: 100px;
+  padding: 22px 0;
+  border-top: 1px solid #ccb888;
+}
+.rulebook-section h3 {
+  margin: 4px 0 12px;
+  color: #203846;
+  font-size: clamp(1.2rem, 4vw, 1.55rem);
+}
+.rulebook-section h4 {
+  margin: 23px 0 8px;
+  font-size: 1.05rem;
+  color: #245444;
+}
+.rulebook-section p,
+.rulebook-section li {
+  font-size: 1rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.rulebook-section p {
+  margin: 10px 0;
+}
+.rulebook-section li + li {
+  margin-top: 8px;
+}
+.rulebook-section ol,
+.rulebook-section ul {
+  padding-left: 1.4em;
+}
+.rulebook-index {
+  color: #76561f;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+.rulebook-figure {
+  margin: 16px 0;
+  padding: 8px;
+  border: 1px solid #b89b69;
+  border-radius: 8px;
+  background: #fff8e9;
+}
+.rulebook-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+}
+.rulebook-figure figcaption {
+  padding: 8px 6px 3px;
+  text-align: center;
+  color: #5e5b50;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.rulebook-finish {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  margin-top: 24px;
+  padding: 22px;
+  border-radius: 8px;
+  color: #fff7e6;
+  background: #245444;
+  text-align: center;
+}
+.rulebook-finish strong {
+  font-size: 1.25rem;
+}
+.rulebook-finish button {
+  margin-top: 6px;
+  padding: 10px 18px;
+  border: 1px solid #b59050;
+  border-radius: 8px;
+  color: #203846;
+  background: #f5dfad;
+}
+@media (max-width: 420px) {
+  .page-head {
+    gap: 5px;
+  }
+  .hero-top .row {
+    gap: 5px;
+  }
+  .hud {
+    gap: 3px;
+  }
+  .hud .rulebook-button {
+    width: 46px;
+    font-size: 0.75rem;
+  }
+  .hud .hud-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    max-width: 66px;
+  }
+  .hud .hud-dots {
+    gap: 1px;
+  }
+  .hud .hud-dot {
+    min-width: 2px;
+  }
+  .rulebook {
+    width: calc(100vw - 16px);
+    max-height: 94dvh;
+  }
+}

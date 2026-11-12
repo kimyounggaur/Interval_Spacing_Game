@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { rulebookScenarios } from "../tests/e2e/rulebook-cases.mjs";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -806,6 +807,8 @@ try {
       if (wanted(id)) await runCase(id, viewport, fn);
     for (const [id, fn] of Object.entries(remasterScenarios))
       if (wanted(id)) await runCase(id, viewport, fn);
+    for (const [id, fn] of Object.entries(rulebookScenarios))
+      if (wanted(id)) await runCase(id, viewport, fn);
     if (wanted("TUTORIAL")) await runCase("TUTORIAL", viewport, tutorial);
     if (wanted("WARMUP")) {
       const initial = save();
@@ -832,11 +835,10 @@ const expected =
     ...Object.keys(scenarios),
     ...Object.keys(extraScenarios),
     ...Object.keys(remasterScenarios),
+    ...Object.keys(rulebookScenarios),
     "TUTORIAL",
     "WARMUP",
     "SCREENSHOTS",
   ].filter(wanted).length;
-console.log(
-  `E2E: ${passed}/${expected} passed (45 core cases, 12 route completions, 9 artwork checks, 3 tutorial checks, 3 warmup checks, 3 screenshot audits)`,
-);
+console.log(`E2E: ${passed}/${expected} passed`);
 if (passed !== expected) process.exitCode = 1;
