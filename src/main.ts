@@ -223,6 +223,8 @@ window.addEventListener("keydown", (event) => {
   if (state.screen !== "run" || state.modal || event.ctrlKey || event.metaKey || event.altKey)
     return;
   if ((event.target as Element).matches("input,select,textarea")) return;
+  // Let the new header button receive its native keyboard activation.
+  if (event.key === "Enter" && (event.target as Element).closest("[data-rulebook-open]")) return;
   if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
     event.preventDefault();
     step(event.key === "ArrowLeft" ? -1 : 1);

@@ -52,7 +52,17 @@ export const rulebookScenarios = {
     );
     const title = await page.locator("#ticket-title").textContent();
     const hud = await page.locator("#hud-dots").getAttribute("aria-label");
-    await open(page);
+    const opener = page.locator("#run [data-rulebook-open]");
+    await opener.focus();
+    await page.keyboard.press("Enter");
+    await page.locator(".rulebook[open]").waitFor();
+    assert.deepEqual(
+      await page.evaluate(() => JSON.parse(localStorage.getItem("ijs_save_v3")).activeRun),
+      before,
+      "Enter opening the rulebook must not move, submit, or change the ticket phase",
+    );
+    assert.equal(await page.locator("#hud-dots").getAttribute("aria-label"), hud);
+    assert.equal(await page.locator("#ticket-title").textContent(), title);
     await page.keyboard.press("Escape");
     await page.locator(".rulebook[open]").waitFor({ state: "hidden" });
     assert.equal(await page.locator("#screen").getAttribute("data-screen"), "run");
