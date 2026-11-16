@@ -3,6 +3,8 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { gzipSync } from "node:zlib";
 import assert from "node:assert/strict";
+import vm from "node:vm";
+import { parse } from "acorn";
 
 const html = readFileSync("dist/index.html", "utf8");
 const bytes = Buffer.byteLength(html);
@@ -119,6 +121,41 @@ assert.ok(
   worker.includes(`ijs-railway-${digest.digest("hex").slice(0, 12)}`),
   "Media-aware cache digest mismatch",
 );
+// Read and execute only the self-contained packed SVG declarations from the
+// actual production script, then compare every decoded illustration to source.
+const script = html.match(/<script type="module"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+assert.ok(script, "Inline production module is missing");
+const tree = parse(script, { ecmaVersion: "latest", sourceType: "module" });
+const hasRulebook = (node) =>
+  node.type === "ObjectExpression" &&
+  node.properties.some((property) => property.key?.value === "arrival-marks.svg");
+const index = tree.body.findIndex(
+  (node) =>
+    node.type === "VariableDeclaration" &&
+    node.declarations.some((item) => hasRulebook(item.init || {})),
+);
+assert.ok(index >= 0, "Packed rulebook missing from production module");
+const declaration = tree.body[index];
+const decoder = tree.body[index + 1];
+assert.equal(decoder?.type, "ForOfStatement", "Rulebook decoder missing");
+const dataName = declaration.declarations.find((item) => hasRulebook(item.init || {})).id.name;
+const sandbox = {};
+vm.runInNewContext(
+  script.slice(declaration.start, declaration.end) +
+    script.slice(decoder.start, decoder.end) +
+    `globalThis.result=${dataName};`,
+  sandbox,
+  { timeout: 1000 },
+);
+const illustrations = readdirSync("src/assets/rulebook").filter((name) => name.endsWith(".svg"));
+assert.equal(
+  Object.keys(sandbox.result).length,
+  illustrations.length,
+  "Rulebook illustration count",
+);
+for (const name of illustrations)
+  assert.equal(sandbox.result[name], readFileSync(`src/assets/rulebook/${name}`, "utf8"), name);
+
 console.log(
   `bundle PASS: HTML ${bytes} bytes, gzip ${gzipBytes}; media ${mediaBytes}; full offline payload ${offlineBytes} bytes; 7 self-hosted illustrations`,
 );
