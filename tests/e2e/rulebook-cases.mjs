@@ -20,10 +20,30 @@ export const rulebookScenarios = {
     assert.ok((await book.locator(".rulebook-nav a").count()) >= 6, "chapter navigation");
     assert.ok((await book.locator(".rulebook-section").count()) >= 6, "complete chapter content");
     assert.ok(
-      (await book.locator(".rulebook-figure .rulebook-art svg").count()) >= 10,
+      (await book.locator(".rulebook-figure .rulebook-art svg").count()) >= 20,
       "illustrations",
     );
     assert.ok((await book.locator(".rulebook-cover-art").count()) >= 1, "illustrated cover");
+    for (const link of await book.locator(".rulebook-nav a").all()) {
+      const href = await link.getAttribute("href");
+      await link.focus();
+      await page.keyboard.press("Enter");
+      const target = book.locator(href);
+      assert.ok(await target.isVisible(), `chapter ${href} is reachable by keyboard`);
+      const positions = await target.evaluate((section) => ({
+        top: section.getBoundingClientRect().top,
+        headerBottom: section
+          .closest("dialog")
+          .querySelector(".rulebook-header")
+          .getBoundingClientRect().bottom,
+      }));
+      assert.ok(positions.top >= positions.headerBottom - 2, `chapter hidden by header: ${href}`);
+    }
+    assert.equal(
+      await book.locator(".rulebook-figure").count(),
+      await book.locator(".rulebook-figure .rulebook-art svg").count(),
+      "every figure contains an illustration",
+    );
     await book.locator('.rulebook-nav a[href="#rb-routes"]').click();
     assert.ok(await book.locator("#rb-routes").isVisible(), "route chapter is reachable");
     await close(page);
@@ -124,7 +144,7 @@ export const rulebookScenarios = {
         }),
       );
       assert.ok(
-        art.length >= 10 && art.every((r) => r.width > 30 && r.height > 30 && r.width <= width),
+        art.length >= 20 && art.every((r) => r.width > 30 && r.height > 30 && r.width <= width),
         JSON.stringify(art),
       );
       await close(page);
